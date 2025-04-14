@@ -1,24 +1,71 @@
-SVILUPPO CLIENT CHE RECUPERA DATI IOT TRUSTED (use case)
+# 🛡️ Smart Insurance DApp – Tirocinio
 
-UNA PIATTAFORMA DI SMART INSURANCES PER DEPLOYARE E SCRIVERE SMART CONTRACT CHE FUNGONO DA ASSICURAZIONI VERE E PROPRIE:
-  - L ASSICURATORE METTE IL CAP DI SOLDI DELL ASSICURAZIONE DENTRO IL CONTRATTO , SOTTO MAGARI DIVERSE VOCI DELL ASSICURAZIONE
-    SE SUCCEDE QUALCOSA TIPO SI ROMPONO I CRISTALLI DELLA MACCHINA IL CONTRATTO RILASCIA AUTOMATICAMENTE I SOLDI ALL ASSICURATO
+## 📌 Obiettivo del Progetto
 
-ESEMPIO PROGETTAZIONE : NELL APP CE UN CONTRATTO BASE (FACTORY) CHE HA CAMPI CHE SI POSSONO COMPLETARE PER CARICARE IL CONTRATTO
-                        (COME SONO FATTI I SMART CONTRACT ASSICURATIVI STANDARD?)
+Sviluppare un'applicazione client che interagisca con smart contract su blockchain, integrando dati IoT *trusted*, per abilitare assicurazioni automatiche e trasparenti tramite tecnologia **smart insurance**.
 
-COSA PUO FARE LA COMPAGNIA ASSICURATIVA : - VISUALIZZA I CONTRATTI CHE HA EROGATO E I FONDI CHE HA MESSO SUI CONTRATTI
-                                          - NE FA DI NUOVI (AD ESEMPIO USANDO IL FACTORY)
-                                          - VISUALIZZA QUALI CONTRATTI HANNO EROGATO QUALI FONDI
+---
 
-COSA PUO FARE L ASSICURATO : - VISUALIZZARE I CONTRATTI CHE HA STIPULATO CON LA COMPAGNIA
-                             - RIEPILOGO FONDI RICEVUTI DA CONTRATTI SE CE NE SONO STATI
-                             - RICHIEDERE MANUALMENTE UNA VERIFICA IN CUI UNA PERSONA VA A VEDERE SE CE DA EROGARE QUALCOSA
+## 🧠 Use Case Principale
 
-PROSSIMI STEP ENTRO VENERDI 25 : - FARE SCHEMA STRUTTURA GENERALE DELL APPLICAZIONE
-                                 - IDEA SU CHE CONTRATTI COSA FANNO 
-                                 - CHE INTERFACCE E SCHERMATE CI SONO NELL APP 
-                                 
+Creazione di una piattaforma per **assicurazioni intelligenti**, dove gli **smart contract** agiscono come vere e proprie polizze assicurative. Il flusso tipico è il seguente:
 
-                             
-    
+- La compagnia assicurativa deposita un **capitale** nel contratto smart.
+- Il contratto gestisce **diverse clausole** (es. danni ai cristalli dell’auto).
+- Al verificarsi di un evento assicurabile, il contratto **rilascia automaticamente** i fondi all’assicurato, **senza bisogno di intermediari**.
+
+---
+
+## 🧱 Architettura Generale
+
+### 🔨 Smart Contracts
+- **Contract Factory**: consente di generare smart contract assicurativi con campi predefiniti (es. tipo di polizza, soglie di attivazione, massimali).
+- **Assurance Contracts**: ogni contratto rappresenta una singola polizza personalizzata tra assicuratore e assicurato.
+
+> Da definire lo **standard** per i contratti assicurativi smart (struttura, eventi, funzioni principali).
+
+---
+
+## 👥 Attori e Funzionalità
+
+### 👔 Compagnia Assicurativa
+- Visualizza tutti i contratti che ha generato.
+- Monitora i fondi depositati nei contratti attivi.
+- Crea nuovi contratti assicurativi tramite la **Factory**.
+- Vede lo storico dei fondi erogati tramite i contratti.
+
+### 🙋‍♂️ Assicurato
+- Consulta i contratti assicurativi sottoscritti.
+- Visualizza il riepilogo dei fondi ricevuti.
+- Può **richiedere una verifica manuale** in caso di mancata erogazione automatica (es. per eventi non coperti da IoT o ambigui).
+
+---
+
+## 🛠️ Prossimi Step (entro venerdì 25)
+
+1. **Schema generale dell'applicazione**
+   - Componenti principali
+   - Comunicazione tra frontend, smart contract e eventuali fonti dati IoT
+
+2. **Progettazione degli Smart Contract**
+   - Che tipo di contratti servono
+   - Cosa fanno e come sono strutturati
+
+3. **Design delle interfacce**
+   - Schermate principali per:
+     - Compagnia assicurativa
+     - Assicurato
+     - Dettaglio contratto
+     - Stato dei fondi
+     - Richiesta verifica manuale
+
+---
+
+## 📦 Tecnologie
+
+> (Da confermare/espandere durante lo sviluppo)
+
+- **Frontend**: Android
+- **Smart Contract**: Solidity, Hardhat
+- **Blockchain**: Ethereum / testnet (es. Sepolia)
+- **Backend/Oracoli IoT**: boh
