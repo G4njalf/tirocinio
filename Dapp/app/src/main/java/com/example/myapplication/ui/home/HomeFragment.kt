@@ -32,6 +32,15 @@ class HomeFragment : Fragment() {
         homeViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
+
+        binding.button1.setOnClickListener{
+            homeViewModel.incrementaContatore()
+        }
+
+        binding.button2.setOnClickListener {
+            homeViewModel.resetContatore()
+        }
+
         return root
     }
 
