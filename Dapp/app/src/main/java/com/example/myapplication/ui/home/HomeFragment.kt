@@ -33,6 +33,11 @@ class HomeFragment : Fragment() {
             textView.text = it
         }
 
+        val textView2 : TextView = binding.textsepolia
+        homeViewModel.text2.observe(viewLifecycleOwner) {
+            textView2.text = it
+        }
+
         binding.button1.setOnClickListener{
             homeViewModel.incrementaContatore()
         }
@@ -40,6 +45,8 @@ class HomeFragment : Fragment() {
         binding.button2.setOnClickListener {
             homeViewModel.resetContatore()
         }
+
+
 
         return root
     }
