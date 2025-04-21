@@ -3,7 +3,7 @@ const { Web3 } = require("web3");
 //updated web3 and hdwallet-provider imports added for convenience
 
 // deploy code will go here
-const { interface, bytecode } = require("./solidity/compile");
+const { interface, bytecode } = require("./compile");
 
 const provider = new HDWalletProvider(
   "catch mix cute accident this nation myself liberty review embark dinner damp",
