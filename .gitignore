@@ -13,4 +13,5 @@ Dapp/.idea/assetWizardSettings.xml
 .externalNativeBuild
 .cxx
 local.properties
+backend/node_modules
 
