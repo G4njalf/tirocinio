@@ -32,6 +32,13 @@ class GalleryFragment : Fragment() {
         galleryViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
+
+        binding.button3.setOnClickListener {
+            galleryViewModel.getFromMongo()
+        }
+
+
+
         return root
     }
 
