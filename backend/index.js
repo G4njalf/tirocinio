@@ -2,28 +2,27 @@ import express from "express";
 import { createServer } from "http";
 import connectDB from "./connect.js";
 import contractRoutes from "./contractRoutes.js";
+import cors from "cors";
 
 const app = express();
-
-const server = createServer(app);
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", true);
   next();
 });
-app.use(express.json());
-/*app.use(
+app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "*",
   })
-);*/
+);
 //app.use(cookieParser());
-
+app.use(express.json());
 app.use("/api/contracts", contractRoutes);
 
 connectDB();
 
 const PORT = 8800;
-server.listen(PORT, () => {
+const server = createServer(app);
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`API working on http://localhost:${PORT}`);
 });
