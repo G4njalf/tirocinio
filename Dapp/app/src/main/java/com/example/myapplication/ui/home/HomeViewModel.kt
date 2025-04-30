@@ -26,9 +26,12 @@ import android.util.Log
 
 class HomeViewModel(application: Application) : AndroidViewModel(application){
 
+    private val editor = application.getSharedPreferences("UserPrefs", Application.MODE_PRIVATE)
+
+    private val userRole = editor.getString("user_role", null)
 
     private val _text2 = MutableLiveData<String>().apply {
-        value = "ciao"
+        value = userRole
     }
 
     val text2: LiveData<String> = _text2

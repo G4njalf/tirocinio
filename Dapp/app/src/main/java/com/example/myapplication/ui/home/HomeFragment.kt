@@ -46,8 +46,6 @@ class HomeFragment : Fragment() {
             homeViewModel.resetContatore()
         }
 
-
-
         return root
     }
 
