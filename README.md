@@ -2,7 +2,7 @@
 
 ## 📌 Obiettivo del Progetto
 
-Sviluppare un'applicazione client che interagisca con smart contract su blockchain, integrando dati IoT *trusted*, per abilitare assicurazioni automatiche e trasparenti tramite tecnologia **smart insurance**.
+Sviluppare un'applicazione client che interagisca con smart contract su blockchain, integrando dati IoT _trusted_, per abilitare assicurazioni automatiche e trasparenti tramite tecnologia **smart insurance**.
 
 ---
 
@@ -19,6 +19,7 @@ Creazione di una piattaforma per **assicurazioni intelligenti**, dove gli **smar
 ## 🧱 Architettura Generale
 
 ### 🔨 Smart Contracts
+
 - **Contract Factory**: consente di generare smart contract assicurativi con campi predefiniti (es. tipo di polizza, soglie di attivazione, massimali).
 - **Assurance Contracts**: ogni contratto rappresenta una singola polizza personalizzata tra assicuratore e assicurato.
 
@@ -29,12 +30,14 @@ Creazione di una piattaforma per **assicurazioni intelligenti**, dove gli **smar
 ## 👥 Attori e Funzionalità
 
 ### 👔 Compagnia Assicurativa
+
 - Visualizza tutti i contratti che ha generato.
 - Monitora i fondi depositati nei contratti attivi.
 - Crea nuovi contratti assicurativi tramite la **Factory**.
 - Vede lo storico dei fondi erogati tramite i contratti.
 
 ### 🙋‍♂️ Assicurato
+
 - Consulta i contratti assicurativi sottoscritti.
 - Visualizza il riepilogo dei fondi ricevuti.
 - Può **richiedere una verifica manuale** in caso di mancata erogazione automatica (es. per eventi non coperti da IoT o ambigui).
@@ -44,10 +47,12 @@ Creazione di una piattaforma per **assicurazioni intelligenti**, dove gli **smar
 ## 🛠️ Prossimi Step (entro venerdì 25)
 
 1. **Schema generale dell'applicazione**
+
    - Componenti principali
    - Comunicazione tra frontend, smart contract e eventuali fonti dati IoT
 
 2. **Progettazione degli Smart Contract**
+
    - Che tipo di contratti servono
    - Cosa fanno e come sono strutturati
 
@@ -69,3 +74,22 @@ Creazione di una piattaforma per **assicurazioni intelligenti**, dove gli **smar
 - **Smart Contract**: Solidity, Hardhat
 - **Blockchain**: Ethereum / testnet (es. Sepolia)
 - **Backend/Oracoli IoT**: boh
+
+## 📝 Note dopo riunione del 28
+
+- la creazione dei contratti partendo dal factory e carta bianca, o si parte
+  da un contratto diverso per ogni voce , oppure un contratto con piu voci come
+  quelli normali l unica cosa e che non deve essere una cosa hardcoded ma una cosa
+  piu generale possibile.
+
+- l assicurato mette una % di soldi per attivare il contratto, questo fara anche
+  da firma e dopo il contratto sara attivo
+
+- non vanno usati gli eth come moneta ma ne va creata una tramite un contratto
+  erc-20 usando il wizard https://wizard.openzeppelin.com/#erc20
+
+- per l erogazione dei soldi invece verra gestita piu o meno cosi :
+  - quando premo verifica manuale su un contratto, il contratto chiamera una
+    funzione di un contratto gia deployato che mi rispondera con un valore (callback?)
+    se il valore e maggiore di una threshold allora il contratto eroghera i soldi
+    (questo andra a simulare il lavoro di un oracolo che va a verificare i dati?)

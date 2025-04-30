@@ -15,6 +15,7 @@ contract InsuranceContract {
     }
 
     function liquidazione() external payable restricted {
+        // chi chiama sta funzione in realta?
         require(!liquidato, "Already liquidated");
         assicurato.transfer(address(this).balance);
         liquidato = true;
