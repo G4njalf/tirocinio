@@ -5,20 +5,24 @@ import "./InsuranceContract.sol";
 
 contract InsuranceFactory {
     address public assicuratore;
+    address public tokenAddress;
     address[] public allInsuranceContracts;
 
-    constructor() {
+    constructor(address _token) {
         assicuratore = msg.sender;
+        tokenAddress = _token;
     }
 
     function createInsurance(
-        address payable assicurato,
+        address assicurato,
         uint premioAssicurativo
-    ) external payable returns (address) {
-        require(msg.value == premioAssicurativo, "Deposit mismatch");
-        InsuranceContract newInsurance = (new InsuranceContract){
-            value: msg.value
-        }(assicuratore, assicurato);
+    ) external returns (address) {
+        InsuranceContract newInsurance = (new InsuranceContract)(
+            assicuratore,
+            assicurato,
+            tokenAddress,
+            premioAssicurativo
+        );
         allInsuranceContracts.push(address(newInsurance));
         return address(newInsurance);
     }
