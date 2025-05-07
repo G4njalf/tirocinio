@@ -10,7 +10,7 @@ module.exports = buildModule("InsuranceFactoryModule", (m) => {
   );
 
   // parametri per il costruttore del contratto
-  const tokenAddress = "0x0"; // Replace with the actual token address
+  const tokenAddress = "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f"; // indirizzo del token su sepolia
 
   const InsuranceFactory = m.contract("InsuranceFactory", [tokenAddress]);
   return { InsuranceFactory };

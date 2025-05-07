@@ -37,7 +37,10 @@ contract InsuranceContract {
     }
 
     function liquidazione() external onlyInsurer {
-        // chi chiama sta funzione in realta?
+        /* premo verifica manuale dall app -> parte sta funzione -> interroga un contratto che mi devono dare l abi
+            l abi mi da un threshold -> controllo, se ok liquido
+            quando cho l abi poi vedo come farlo 
+        */
         require(!liquidato, "Already liquidated");
         require(attivato, "Contract not activated yet");
         require(funded, "Contract has to be funded");
@@ -46,7 +49,7 @@ contract InsuranceContract {
     }
 
     function activateContract() external onlyInsured {
-        // l assicurato per attivare il contratto manda una piccola percentuale
+        // l assicurato per attivare il contratto manda una piccola percentuale (si puo parametrizzare dalla factory)
         // del premio assicurativo, che viene poi restituita all assicurato in caso di liquidazione
         require(!liquidato, "Already liquidated");
         require(!attivato, "Already activated");
