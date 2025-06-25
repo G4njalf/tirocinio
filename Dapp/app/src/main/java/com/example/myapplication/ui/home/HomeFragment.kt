@@ -28,27 +28,17 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
-
         val textView2 : TextView = binding.textsepolia
         homeViewModel.text2.observe(viewLifecycleOwner) {
             textView2.text = it
         }
 
-        binding.button1.setOnClickListener{
-            homeViewModel.incrementaContatore()
-        }
-
-        binding.button2.setOnClickListener {
-            homeViewModel.resetContatore()
+        binding.button1.setOnClickListener {
+            homeViewModel.getDataFromSepolia()
         }
 
         return root
     }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
