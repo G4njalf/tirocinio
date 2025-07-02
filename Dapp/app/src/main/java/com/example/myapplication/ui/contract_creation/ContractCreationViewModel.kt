@@ -3,11 +3,59 @@ package com.example.myapplication.ui.contract_creation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import android.util.Log
+import com.example.myapplication.data.BlockChainCalls
+import com.example.myapplication.data.ContractCalls
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import org.web3j.abi.datatypes.generated.Uint256
 
 class ContractCreationViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is Contract Creation Fragment"
+    private val blockChainCalls = BlockChainCalls()
+    private val contractCalls = ContractCalls()
+
+
+
+    // Function to create a contract
+    fun createContract(address: String, premio: UInt) {
+        Log.d("ContractCreationViewModel", "Creating contract for: ${address}, Premio: $premio")
+        if (premio <= 0u) {
+            Log.e("ContractCreationViewModel", "Premio must be greater than zero")
+            return
+        }
+        viewModelScope.launch {
+            var isValid = false
+            var contractAddress = ""
+            try {
+                isValid = blockChainCalls.isWalletAddressValid(address)
+                Log.d("ContractCreationViewModel", "Address validation result: $isValid")
+            }
+            catch (e: Exception) {
+                Log.e("ContractCreationViewModel", "Error validating address: $address", e)
+                return@launch
+            }
+            if (isValid) {
+                try {
+                    contractAddress = contractCalls.createNewContract(address, Uint256(premio.toLong()))
+                    Log.d("ContractCreationViewModel", "Contract created at address: $contractAddress")
+
+                } catch (e: Exception) {
+                    Log.e("ContractCreationViewModel", "Error creating contract", e)
+                }
+                try {
+                    val contractData = contractCalls.getContractVariables(contractAddress)
+                    Log.d("ContractCreationViewModel", "Contract data: $contractData")
+                }
+                catch (e: Exception) {
+                    Log.e("ContractCreationViewModel", "Error fetching contract data", e)
+                }
+            } else {
+                Log.e("ContractCreationViewModel", "Invalid address: $address")
+            }
+        }
     }
-    val text: LiveData<String> = _text
+
+
+
 }

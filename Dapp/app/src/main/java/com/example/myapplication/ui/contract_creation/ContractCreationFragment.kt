@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.databinding.FragmentContractCreationBinding
 
+
 class ContractCreationFragment : Fragment() {
 
     private var _binding: FragmentContractCreationBinding? = null
@@ -22,16 +23,22 @@ class ContractCreationFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val slideshowViewModel =
-            ViewModelProvider(this).get(ContractCreationViewModel::class.java)
+        val contractCreationViewModel =
+            ViewModelProvider(this)[ContractCreationViewModel::class.java]
 
         _binding = FragmentContractCreationBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textSlideshow
-        slideshowViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+
+
+        binding.buttonCreateContract.setOnClickListener {
+            val insuredAddress = binding.editTextEnsurer.text.toString()
+            val premio = binding.editTextPremio.text.toString().toUIntOrNull() ?: 0u
+            contractCreationViewModel.createContract(insuredAddress,premio)
         }
+
+
+
         return root
     }
 

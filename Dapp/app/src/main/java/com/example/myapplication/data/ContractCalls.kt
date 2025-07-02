@@ -16,21 +16,46 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.util.Log
+import org.bouncycastle.util.test.FixedSecureRandom.BigInteger
 import org.web3j.abi.datatypes.Bool
 import org.web3j.abi.datatypes.generated.Uint256
 import org.web3j.abi.datatypes.DynamicArray
 
 class DynamicAddressArray(addresses: List<Address>) : DynamicArray<Address>(Address::class.java, addresses)
 
+private val infuraurl ="https://sepolia.infura.io/v3/3e885576a998490992a7cdaa69e2ed2f"
+private val web3 = Web3j.build(HttpService(infuraurl))
+private val myAddress = "0x8C6b618aC0b1E69FA7FF02Ec2a8EB6caDC29bc86"
+private val tokenAddress = "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f"
+private val factoryAddress = "0xa133327Baa93455433bC8Ea547B77704f84042a7"
+private val privateKeyAssicuratore = "REMOVED" // non ci sono soldi veri non rubatemi i fondi :D
+private val privateKeyAssicurato = "REMOVED" // non ci sono soldi veri non rubatemi i fondi :D
+
+class BlockChainCalls{
+    // Function to verify if the address is a valid Ethereum Sepolia address
+
+    suspend fun isWalletAddressValid(address: String): Boolean = withContext(Dispatchers.IO) {
+        Log.d("BlockChainCalls", "Checking if address is valid: $address")
+        if (!address.matches(Regex("^0x[a-fA-F0-9]{40}$"))) {
+            Log.e("BlockChainCalls", "Invalid Ethereum address format: $address")
+            return@withContext false
+        }
+        return@withContext try {
+            Log.d("BlockChainCalls", "Fetching balance for address: $address")
+            val balance = web3.ethGetBalance(address, DefaultBlockParameterName.LATEST)
+                .send()
+                .balance
+            Log.d("BlockChainCalls", "Balance for address $address: $balance")
+            true
+        } catch (e: Exception) {
+            Log.e("BlockChainCalls", "Error fetching balance for address: $address", e)
+            false
+        }
+    }
+}
+
+
 class ContractCalls {
-
-    private val myAddress = "0x8C6b618aC0b1E69FA7FF02Ec2a8EB6caDC29bc86"
-    private val tokenAddress = "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f"
-    private val factoryAddress = "0xa133327Baa93455433bC8Ea547B77704f84042a7"
-    private val infuraurl ="https://sepolia.infura.io/v3/3e885576a998490992a7cdaa69e2ed2f"
-    private val web3 = Web3j.build(HttpService(infuraurl))
-    private val privateKey = "REMOVED"
-
 
     // Function to get the token balance of the user's address
 
@@ -56,6 +81,10 @@ class ContractCalls {
     // Function to create a new insurance contract from the factory contract
 
     suspend fun createNewContract(addrAssicurato: String, premio: Uint256): String = withContext(Dispatchers.IO){
+
+        val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
+
+
         val function = Function(
             "createInsurance",
             listOf(
@@ -168,7 +197,11 @@ class ContractCalls {
             ).send()
 
             val decoded = FunctionReturnDecoder.decode(response.value, function.outputParameters)
-            results[name] = decoded[0].value
+            if (decoded.isNotEmpty()) {
+                results[name] = decoded[0].value
+            } else {
+                Log.e("ContractCalls", "Decoded response for function $name is empty")
+            }
         }
 
         return@withContext results

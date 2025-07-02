@@ -6,17 +6,37 @@
     android:layout_height="match_parent"
     tools:context=".ui.contract_creation.ContractCreationFragment">
 
-    <TextView
-        android:id="@+id/text_slideshow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <EditText
+        android:id="@+id/editTextEnsurer"
+        android:layout_width="256dp"
+        android:layout_height="108dp"
+        android:ems="10"
+        android:inputType="text"
+        android:hint="Inserisci Indirizzo Assicurato"
+        app:layout_constraintBottom_toTopOf="@+id/editTextPremio"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextPremio"
+        android:layout_width="214dp"
+        android:layout_height="91dp"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="Inserisci Premio"
+        app:layout_constraintTop_toBottomOf="@+id/editTextEnsurer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/buttonCreateContract"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Crea"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPremio"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
