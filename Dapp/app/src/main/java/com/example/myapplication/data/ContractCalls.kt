@@ -20,6 +20,9 @@ import org.bouncycastle.util.test.FixedSecureRandom.BigInteger
 import org.web3j.abi.datatypes.Bool
 import org.web3j.abi.datatypes.generated.Uint256
 import org.web3j.abi.datatypes.DynamicArray
+import org.web3j.crypto.RawTransaction
+import org.web3j.crypto.TransactionEncoder
+import org.web3j.utils.Numeric
 
 class DynamicAddressArray(addresses: List<Address>) : DynamicArray<Address>(Address::class.java, addresses)
 
@@ -84,6 +87,11 @@ class ContractCalls {
 
         val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
 
+        val nonce = web3.ethGetTransactionCount(myAddress, DefaultBlockParameterName.LATEST)
+            .send().transactionCount
+
+        val gasPrice = web3.ethGasPrice().send().gasPrice
+        val gasLimit = 300000 // per ora cosi
 
         val function = Function(
             "createInsurance",
@@ -98,14 +106,33 @@ class ContractCalls {
 
         val encodedFunction = FunctionEncoder.encode(function)
 
-        val response = web3.ethCall(
-            Transaction.createEthCallTransaction(myAddress, factoryAddress, encodedFunction),
-            DefaultBlockParameterName.LATEST
-        ).send()
+        val transaction = RawTransaction.createTransaction(
+            nonce,
+            gasPrice,
+            gasLimit.toBigInteger(),
+            factoryAddress,
+            encodedFunction
+        )
 
-        val decoded = FunctionReturnDecoder.decode(response.value, function.outputParameters)
+        val signedTransaction = TransactionEncoder.signMessage(
+            transaction,
+            web3.ethChainId().send().chainId.toLong(), // Sepolia chain ID
+            credentials
+        )
 
-        return@withContext decoded[0].value.toString()
+        val hexValue = Numeric.toHexString(signedTransaction)
+
+        val response = web3.ethSendRawTransaction(hexValue).send()
+
+        if (response.hasError()) {
+            Log.e("createNewContract", "Transaction error: ${response.error.message}")
+            throw Exception("Smart contract creation failed: ${response.error.message}")
+        }
+
+        val txHash = response.transactionHash
+        Log.d("createNewContract", "Tx hash: $txHash")
+
+        return@withContext txHash
     }
 
     // Function to get the address of the insurance contract created by the factory contract

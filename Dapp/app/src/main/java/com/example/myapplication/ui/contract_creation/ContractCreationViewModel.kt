@@ -17,7 +17,8 @@ class ContractCreationViewModel : ViewModel() {
 
 
 
-    // Function to create a contract
+    // Function to create a contract [poi chiamo getallContracts per prendere tutti i contratti e ritorno l ultimo]
+    // funziona se sono l unico alla volta che crea un contratto
     fun createContract(address: String, premio: UInt) {
         Log.d("ContractCreationViewModel", "Creating contract for: ${address}, Premio: $premio")
         if (premio <= 0u) {
@@ -37,11 +38,17 @@ class ContractCreationViewModel : ViewModel() {
             }
             if (isValid) {
                 try {
-                    contractAddress = contractCalls.createNewContract(address, Uint256(premio.toLong()))
-                    Log.d("ContractCreationViewModel", "Contract created at address: $contractAddress")
+                    val txHash = contractCalls.createNewContract(address, Uint256(premio.toLong()))
+                    Log.d("ContractCreationViewModel", "Contract created transaction Hash: $txHash")
 
                 } catch (e: Exception) {
                     Log.e("ContractCreationViewModel", "Error creating contract", e)
+                }
+                try {
+                   contractAddress = contractCalls.getAllInsuranceContracts().lastOrNull() ?: ""
+                }
+                catch (e: Exception) {
+                    Log.e("ContractCreationViewModel", "Error fetching last contract address", e)
                 }
                 try {
                     val contractData = contractCalls.getContractVariables(contractAddress)
