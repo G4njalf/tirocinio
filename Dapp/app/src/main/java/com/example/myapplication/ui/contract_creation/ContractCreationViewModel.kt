@@ -28,6 +28,7 @@ class ContractCreationViewModel : ViewModel() {
         viewModelScope.launch {
             var isValid = false
             var contractAddress = ""
+            var txHash = ""
             try {
                 isValid = blockChainCalls.isWalletAddressValid(address)
                 Log.d("ContractCreationViewModel", "Address validation result: $isValid")
@@ -38,14 +39,21 @@ class ContractCreationViewModel : ViewModel() {
             }
             if (isValid) {
                 try {
-                    val txHash = contractCalls.createNewContract(address, Uint256(premio.toLong()))
+                    txHash = contractCalls.createNewContract(address, Uint256(premio.toLong()))
                     Log.d("ContractCreationViewModel", "Contract created transaction Hash: $txHash")
 
                 } catch (e: Exception) {
                     Log.e("ContractCreationViewModel", "Error creating contract", e)
                 }
                 try {
-                   contractAddress = contractCalls.getAllInsuranceContracts().lastOrNull() ?: ""
+                    val receipt = blockChainCalls.waitForReceipt(txHash)
+                    if (receipt.status == "0x1") {
+                        Log.d("ContractCreationViewModel", "Transaction successful: $txHash")
+                        contractAddress = contractCalls.getAllInsuranceContracts().lastOrNull() ?: ""
+                        Log.d("ContractCreationViewModel", "Last contract address: $contractAddress")
+                    } else {
+                        Log.e("ContractCreationViewModel", "Transaction failed: $txHash")
+                    }
                 }
                 catch (e: Exception) {
                     Log.e("ContractCreationViewModel", "Error fetching last contract address", e)

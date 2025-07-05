@@ -16,13 +16,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.util.Log
-import org.bouncycastle.util.test.FixedSecureRandom.BigInteger
 import org.web3j.abi.datatypes.Bool
 import org.web3j.abi.datatypes.generated.Uint256
 import org.web3j.abi.datatypes.DynamicArray
 import org.web3j.crypto.RawTransaction
 import org.web3j.crypto.TransactionEncoder
 import org.web3j.utils.Numeric
+import java.math.BigInteger
+import org.web3j.protocol.core.methods.response.TransactionReceipt
+import kotlinx.coroutines.delay
 
 class DynamicAddressArray(addresses: List<Address>) : DynamicArray<Address>(Address::class.java, addresses)
 
@@ -55,6 +57,18 @@ class BlockChainCalls{
             false
         }
     }
+
+    suspend fun waitForReceipt(txHash: String): TransactionReceipt = withContext(Dispatchers.IO) {
+        while (true) {
+            val receiptOptional = web3.ethGetTransactionReceipt(txHash).send().transactionReceipt
+            if (receiptOptional.isPresent) {
+                return@withContext receiptOptional.get()
+            }
+            delay(3000) // aspetta 3 secondi
+        }
+        throw Exception("Transaction receipt not found") // Gestione del caso in cui il ciclo non restituisce mai un valore
+    }
+
 }
 
 
@@ -86,18 +100,20 @@ class ContractCalls {
     suspend fun createNewContract(addrAssicurato: String, premio: Uint256): String = withContext(Dispatchers.IO){
 
         val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
-
-        val nonce = web3.ethGetTransactionCount(myAddress, DefaultBlockParameterName.LATEST)
+        Log.d("a", "a ${Address(addrAssicurato)}")
+        Log.d("a", "a ${premio.value}")
+        val nonce = web3.ethGetTransactionCount(myAddress, DefaultBlockParameterName.PENDING)
             .send().transactionCount
 
-        val gasPrice = web3.ethGasPrice().send().gasPrice
-        val gasLimit = 300000 // per ora cosi
+        val basegasPrice = web3.ethGasPrice().send().gasPrice
+        val gasPrice = basegasPrice.multiply(BigInteger.valueOf(120)).divide(BigInteger.valueOf(100)) // 20% more than the base gas price
+        val gasLimit = BigInteger.valueOf(1_500_000L) // per ora cosi
 
         val function = Function(
             "createInsurance",
             listOf(
                 Address(addrAssicurato),
-                org.web3j.abi.datatypes.generated.Uint256(premio.value)
+                Uint256(premio.value)
                 ), // inputs
             listOf(
                 TypeReference.create(org.web3j.abi.datatypes.Address::class.java) // output type
@@ -109,10 +125,12 @@ class ContractCalls {
         val transaction = RawTransaction.createTransaction(
             nonce,
             gasPrice,
-            gasLimit.toBigInteger(),
+            gasLimit,
             factoryAddress,
             encodedFunction
         )
+
+        Log.d("","chainId: ${web3.ethChainId().send().chainId.toLong()}")
 
         val signedTransaction = TransactionEncoder.signMessage(
             transaction,
@@ -141,7 +159,7 @@ class ContractCalls {
         val function = Function(
             "getAllInsuranceContracts",
             emptyList(), // no inputs
-            listOf(TypeReference.create(DynamicAddressArray::class.java)) // output type
+            listOf(object : TypeReference<DynamicArray<Address>>() {}) // output type
         )
 
         val encodedFunction = FunctionEncoder.encode(function)
@@ -153,6 +171,7 @@ class ContractCalls {
 
         val decoded = FunctionReturnDecoder.decode(response.value, function.outputParameters)
         val addressList = decoded[0].value as List<*>
+        Log.d("getAllInsuranceContracts", "Decoded addresses: $addressList")
         return@withContext addressList
             .map { it as Address }
             .map { it.value }
