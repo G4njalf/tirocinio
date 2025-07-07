@@ -15,14 +15,17 @@ class ContractCreationViewModel : ViewModel() {
     private val blockChainCalls = BlockChainCalls()
     private val contractCalls = ContractCalls()
 
-
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
 
     // Function to create a contract [poi chiamo getallContracts per prendere tutti i contratti e ritorno l ultimo]
     // funziona se sono l unico alla volta che crea un contratto
     fun createContract(address: String, premio: UInt) {
+        _isLoading.value = true
         Log.d("ContractCreationViewModel", "Creating contract for: ${address}, Premio: $premio")
         if (premio <= 0u) {
             Log.e("ContractCreationViewModel", "Premio must be greater than zero")
+            _isLoading.value = false
             return
         }
         viewModelScope.launch {
@@ -34,6 +37,7 @@ class ContractCreationViewModel : ViewModel() {
                 Log.d("ContractCreationViewModel", "Address validation result: $isValid")
             }
             catch (e: Exception) {
+                _isLoading.value = false
                 Log.e("ContractCreationViewModel", "Error validating address: $address", e)
                 return@launch
             }
@@ -43,6 +47,7 @@ class ContractCreationViewModel : ViewModel() {
                     Log.d("ContractCreationViewModel", "Contract created transaction Hash: $txHash")
 
                 } catch (e: Exception) {
+                    _isLoading.value = false
                     Log.e("ContractCreationViewModel", "Error creating contract", e)
                 }
                 try {
@@ -56,6 +61,7 @@ class ContractCreationViewModel : ViewModel() {
                     }
                 }
                 catch (e: Exception) {
+                    _isLoading.value = false
                     Log.e("ContractCreationViewModel", "Error fetching last contract address", e)
                 }
                 try {
@@ -63,11 +69,13 @@ class ContractCreationViewModel : ViewModel() {
                     Log.d("ContractCreationViewModel", "Contract data: $contractData")
                 }
                 catch (e: Exception) {
+                    _isLoading.value = false
                     Log.e("ContractCreationViewModel", "Error fetching contract data", e)
                 }
             } else {
                 Log.e("ContractCreationViewModel", "Invalid address: $address")
             }
+            _isLoading.value = false
         }
     }
 

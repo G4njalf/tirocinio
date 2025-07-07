@@ -10,10 +10,10 @@
         android:id="@+id/editTextEnsurer"
         android:layout_width="256dp"
         android:layout_height="108dp"
+        android:layout_marginTop="36dp"
         android:ems="10"
         android:hint="Inserisci Indirizzo Assicurato"
         android:inputType="text"
-        app:layout_constraintBottom_toTopOf="@+id/editTextPremio"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,21 +23,35 @@
         android:id="@+id/editTextPremio"
         android:layout_width="214dp"
         android:layout_height="91dp"
+        android:layout_marginTop="68dp"
         android:ems="10"
         android:hint="Inserisci Premio"
         android:inputType="number"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="292dp" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextEnsurer" />
 
     <Button
         android:id="@+id/buttonCreateContract"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
         android:text="Crea"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextPremio" />
+
+    <ProgressBar
+        android:id="@+id/progressBarCreateContract"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonCreateContract" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

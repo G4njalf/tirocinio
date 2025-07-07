@@ -29,7 +29,11 @@ class ContractCreationFragment : Fragment() {
         _binding = FragmentContractCreationBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        binding.progressBarCreateContract.visibility = View.GONE
 
+        contractCreationViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBarCreateContract.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
 
         binding.buttonCreateContract.setOnClickListener {
             val insuredAddress = binding.editTextEnsurer.text.toString()
