@@ -55,6 +55,7 @@ class ContractCreationViewModel : ViewModel() {
                     if (receipt.status == "0x1") {
                         Log.d("ContractCreationViewModel", "Transaction successful: $txHash")
                         contractAddress = contractCalls.getAllInsuranceContracts().lastOrNull() ?: ""
+
                         Log.d("ContractCreationViewModel", "Last contract address: $contractAddress")
                     } else {
                         Log.e("ContractCreationViewModel", "Transaction failed: $txHash")

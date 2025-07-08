@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.myapplication.data.CounterRepository
+import com.example.myapplication.data.ContractRepository
 import com.example.myapplication.data.ContractCalls
 import android.util.Log
 import androidx.lifecycle.viewModelScope
@@ -23,7 +23,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
 
     val text2: LiveData<String> = _text2
 
-    private val repository = CounterRepository(application.applicationContext)
     private val contractCalls = ContractCalls()
 
 

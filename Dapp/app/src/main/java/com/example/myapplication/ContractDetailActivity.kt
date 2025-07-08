@@ -18,13 +18,24 @@ class ContractDetailActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Recupera i dati dall'Intent
-        val title = intent.getStringExtra("contractTitle")
         val address = intent.getStringExtra("contractAddress")
+        val premio = intent.getStringExtra("contractPremio")
+        val isLiquidato = intent.getBooleanExtra("contractIsLiquidato", false)
+        val isAttivato = intent.getBooleanExtra("contractIsAttivato", false)
+        val isFundend = intent.getBooleanExtra("contractIsFundend", false)
+        val addressAssicurato = intent.getStringExtra("contractAddressAssicurato")
+        val addressAssicuratore = intent.getStringExtra("contractAddressAssicuratore")
 
         Log.i("ContractDetailActivity", "Title: $title, Address: $address")
 
         // Imposta i dati nelle TextView
-        binding.titleTextView.text = title ?: "Dettagli del Contratto"
         binding.addressTextView.text = address ?: "Indirizzo non disponibile"
+        binding.premioTextView.text = premio ?: "Premio non disponibile"
+        binding.isLiquidatoTextView.text = if (isLiquidato) "Liquidato" else "Non Liquidato"
+        binding.isAttivatoTextView.text = if (isAttivato) "Attivato" else "Non Attivato"
+        binding.isFundendTextView.text = if (isFundend) "Fondato" else "Non Fondato"
+        binding.addressAssicuratoTextView.text = addressAssicurato ?: "Indirizzo Assicurato non disponibile"
+        binding.addressAssicuratoreTextView.text = addressAssicuratore ?: "Indirizzo Assicuratore non disponibile"
+        
     }
 }

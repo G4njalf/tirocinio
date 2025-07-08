@@ -11,7 +11,12 @@ import com.example.myapplication.R
 
 data class Contract(
     val address: String,
-    val title: String)
+    val premio: UInt,
+    val isLiquidato: Boolean,
+    val isAttivato: Boolean,
+    val isFundend: Boolean,
+    val addressAssicurato: String,
+    val addressAssicuratore: String)
 
 class ContractAdapter(private val contractList: List<Contract>):RecyclerView.Adapter<ContractAdapter.ContractViewHolder>() {
 
@@ -29,14 +34,18 @@ class ContractAdapter(private val contractList: List<Contract>):RecyclerView.Ada
     override fun onBindViewHolder(holder: ContractViewHolder, position: Int) {
         val contract = contractList[position]
         holder.addressText.text = contract.address
-        holder.titleText.text = "${contract.title} !"
+        holder.titleText.text = "${contract.premio} !"
 
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context,ContractDetailActivity::class.java).apply {
                 putExtra("contractAddress", contract.address)
-                putExtra("contractTitle", contract.title)
-
+                putExtra("contractPremio", contract.premio.toString())
+                putExtra("contractIsLiquidato", contract.isLiquidato)
+                putExtra("contractIsAttivato", contract.isAttivato)
+                putExtra("contractIsFundend", contract.isFundend)
+                putExtra("contractAddressAssicurato", contract.addressAssicurato)
+                putExtra("contractAddressAssicuratore", contract.addressAssicuratore)
             }
             context.startActivity(intent)
         }
