@@ -10,6 +10,27 @@ contract InsuranceContract {
     bool public attivato;
     bool public funded;
     IERC20 public token; // ERC20 token
+    event Liquidation(
+        address contractAddress,
+        address indexed assicurato,
+        address indexed assicuratore,
+        uint premio,
+        bool liquidato
+    );
+    event Funded(
+        address contractAddress,
+        address indexed assicurato,
+        address indexed assicuratore,
+        uint premio,
+        bool funded
+    );
+    event Activated(
+        address contractAddress,
+        address indexed assicurato,
+        address indexed assicuratore,
+        uint premio,
+        bool attivato
+    );
 
     constructor(
         address _assicuratore,
@@ -34,6 +55,7 @@ contract InsuranceContract {
             premio // l assicuratore manda il premio all assicurato
         );
         funded = true;
+        emit Funded(address(this), assicurato, assicuratore, premio, true);
     }
 
     function liquidazione() external onlyInsurer {
@@ -46,6 +68,7 @@ contract InsuranceContract {
         require(funded, "Contract has to be funded");
         token.transfer(assicurato, premio); // trasferisce il premio all assicurato
         liquidato = true;
+        emit Liquidation(address(this), assicurato, assicuratore, premio, true);
     }
 
     function activateContract() external onlyInsured {
@@ -60,6 +83,7 @@ contract InsuranceContract {
             (premio * 5) / 100 // 5% del premio assicurativo
         );
         attivato = true;
+        emit Activated(address(this), assicurato, assicuratore, premio, true);
     }
 
     modifier onlyInsurer() {

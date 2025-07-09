@@ -16,7 +16,7 @@ workflow remix :
 */
 
 const tokenAddress = "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f";
-const factoryAddress = "0xa133327Baa93455433bC8Ea547B77704f84042a7";
+const factoryAddress = "0xf213e4E6c97Ba84ed12Dc696e6F86c45F61abDfe";
 const path = require("path");
 const Web3 = require("web3").Web3;
 const web3 = new Web3(
