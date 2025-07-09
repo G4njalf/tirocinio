@@ -32,7 +32,7 @@ private val infuraurl ="https://sepolia.infura.io/v3/3e885576a998490992a7cdaa69e
 private val web3 = Web3j.build(HttpService(infuraurl))
 private val myAddress = "0x8C6b618aC0b1E69FA7FF02Ec2a8EB6caDC29bc86"
 private val tokenAddress = "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f"
-private val factoryAddress = "0xa133327Baa93455433bC8Ea547B77704f84042a7"
+private val factoryAddress = "0x436876eEbf100db46c32a780A65121B8fdF758Aa"
 private val privateKeyAssicuratore = "REMOVED" // non ci sono soldi veri non rubatemi i fondi :D
 private val privateKeyAssicurato = "REMOVED" // non ci sono soldi veri non rubatemi i fondi :D
 
@@ -176,6 +176,28 @@ class ContractCalls {
             .map { it as Address }
             .map { it.value }
 
+    }
+
+    suspend fun getInsuranceContractsByInsured(insuredAddress: String) : List<String> = withContext(Dispatchers.IO) {
+        val function = Function(
+            "getInsuranceContractsByInsured",
+            listOf(Address(insuredAddress)),
+            listOf(object : TypeReference<DynamicArray<Address>>() {})
+        )
+
+        val encodedFunction = FunctionEncoder.encode(function)
+
+        val response = web3.ethCall(
+            Transaction.createEthCallTransaction(myAddress, factoryAddress, encodedFunction),
+            DefaultBlockParameterName.LATEST
+        ).send()
+
+        val decoded = FunctionReturnDecoder.decode(response.value, function.outputParameters)
+        val addressList = decoded[0].value as List<*>
+        Log.d("getInsuranceContractsByInsured", "Decoded addresses: $addressList")
+        return@withContext addressList
+            .map { it as Address }
+            .map { it.value }
     }
 
     // Function to get the variables of a specific insurance contract

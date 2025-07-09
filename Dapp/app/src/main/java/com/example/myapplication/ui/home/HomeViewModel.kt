@@ -7,15 +7,16 @@ import androidx.lifecycle.MutableLiveData
 import com.example.myapplication.data.ContractRepository
 import com.example.myapplication.data.ContractCalls
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 
 class HomeViewModel(application: Application) : AndroidViewModel(application){
 
-    private val editor = application.getSharedPreferences("UserPrefs", Application.MODE_PRIVATE)
-
+    private val editor = application.getSharedPreferences("UserPrefs", MODE_PRIVATE)
     private val userRole = editor.getString("user_role", null)
+    private val userAddress = editor.getString("user_address", null)
 
     private val _text2 = MutableLiveData<String>().apply {
         value = userRole
@@ -26,8 +27,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
     private val contractCalls = ContractCalls()
 
 
-
     fun getDataFromSepolia(){
+        Log.d("Role", "User role is: $userRole , User address is: $userAddress")
         viewModelScope.launch {
             try {
                 val balance = contractCalls.getTokenBalance()

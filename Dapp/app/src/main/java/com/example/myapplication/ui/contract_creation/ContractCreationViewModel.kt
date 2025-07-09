@@ -9,11 +9,13 @@ import com.example.myapplication.data.ContractCalls
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.web3j.abi.datatypes.generated.Uint256
+import com.example.myapplication.data.ContractRepository
 
 class ContractCreationViewModel : ViewModel() {
 
     private val blockChainCalls = BlockChainCalls()
     private val contractCalls = ContractCalls()
+    private val contractRepository = ContractRepository()
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
@@ -67,6 +69,15 @@ class ContractCreationViewModel : ViewModel() {
                 }
                 try {
                     val contractData = contractCalls.getContractVariables(contractAddress)
+                    /*contractRepository.addContract(
+                        contractAddress,
+                        contractData["premio"] as UInt,
+                        contractData["liquidato"] as Boolean,
+                        contractData["attivato"] as Boolean,
+                        contractData["funded"] as Boolean,
+                        contractData["assicurato"] as String,
+                        contractData["assicuratore"] as String
+                    )*/
                     Log.d("ContractCreationViewModel", "Contract data: $contractData")
                 }
                 catch (e: Exception) {

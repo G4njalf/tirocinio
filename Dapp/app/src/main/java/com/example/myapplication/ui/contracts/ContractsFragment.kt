@@ -22,7 +22,7 @@ class ContractsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val galleryViewModel =
+        val contractViewModel =
             ViewModelProvider(this)[ContractsViewModel::class.java]
 
         _binding = FragmentContractsBinding.inflate(inflater, container, false)
@@ -32,21 +32,12 @@ class ContractsFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        val contratti = listOf(
-            Contract(
-                "0x1234567890abcdef1234567890abcdef12345678",
-                100u,
-                false,
-                false,
-                false,
-                "0xabcdefabcdefabcdefabcdefabcdefabcdef",
-                "0x1234567890abcdef1234567890abcdef12345678"
-            )
-        )
+        contractViewModel.loadContracts()
 
-        val adapter = ContractAdapter(contratti)
-
-        recyclerView.adapter = adapter
+        contractViewModel.contracts.observe(viewLifecycleOwner) { contratti ->
+            val adapter = ContractAdapter(contratti)
+            recyclerView.adapter = adapter
+        }
 
         // cose qui
 
