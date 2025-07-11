@@ -2,8 +2,14 @@ package com.example.myapplication
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.databinding.ContractDetailsBinding
+import com.example.myapplication.data.ContractCalls
+import com.example.myapplication.data.BlockChainCalls
+import kotlinx.coroutines.launch
+import java.math.BigInteger
 
 class ContractDetailActivity : AppCompatActivity() {
 
@@ -17,6 +23,19 @@ class ContractDetailActivity : AppCompatActivity() {
         binding = ContractDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val contractCalls = ContractCalls()
+        val blockChainCalls = BlockChainCalls()
+
+        val editor = application.getSharedPreferences("UserPrefs", MODE_PRIVATE)
+        val userRole = editor.getString("user_role", null)
+        val userAddress = editor.getString("user_address", null)
+
+        val activateBtn = binding.activateContractbtn
+        val liquidateBtn = binding.liquidateContractBtn
+        val fundBtn = binding.fundContractbtn
+        val progression = binding.progressBarDetail
+        progression.visibility= View.GONE
+
         // Recupera i dati dall'Intent
         val address = intent.getStringExtra("contractAddress")
         val premio = intent.getStringExtra("contractPremio")
@@ -29,13 +48,83 @@ class ContractDetailActivity : AppCompatActivity() {
         Log.i("ContractDetailActivity", "Title: $title, Address: $address")
 
         // Imposta i dati nelle TextView
-        binding.addressTextView.text = address ?: "Indirizzo non disponibile"
-        binding.premioTextView.text = premio ?: "Premio non disponibile"
+        binding.addressTextView.text = "Indirizzo del contratto : ${address}" ?: "Indirizzo non disponibile"
+        binding.premioTextView.text = "Premio : ${premio}" ?: "Premio non disponibile"
         binding.isLiquidatoTextView.text = if (isLiquidato) "Liquidato" else "Non Liquidato"
         binding.isAttivatoTextView.text = if (isAttivato) "Attivato" else "Non Attivato"
         binding.isFundendTextView.text = if (isFundend) "Fondato" else "Non Fondato"
-        binding.addressAssicuratoTextView.text = addressAssicurato ?: "Indirizzo Assicurato non disponibile"
-        binding.addressAssicuratoreTextView.text = addressAssicuratore ?: "Indirizzo Assicuratore non disponibile"
-        
+        binding.addressAssicuratoTextView.text = "Indirizzo assicurato : ${addressAssicurato}" ?: "Indirizzo Assicurato non disponibile"
+        binding.addressAssicuratoreTextView.text = "Indirizzo assicuratore : ${addressAssicuratore}" ?: "Indirizzo Assicuratore non disponibile"
+
+
+
+        if (userRole == "cliente") {
+            activateBtn.visibility = if (!isAttivato and isFundend) View.VISIBLE else View.GONE
+            liquidateBtn.visibility = if(!isLiquidato and isAttivato and isFundend) View.VISIBLE else View.GONE
+            fundBtn.visibility = View.GONE
+        }
+        else if (userRole == "assicuratore") {
+            activateBtn.visibility = View.GONE
+            liquidateBtn.visibility = View.GONE
+            fundBtn.visibility = if (!isFundend) View.VISIBLE else View.GONE
+        } else {
+            activateBtn.visibility = View.GONE
+            liquidateBtn.visibility = View.GONE
+            fundBtn.visibility = View.GONE
+        }
+
+        // Gestione dei click sui bottoni
+
+        binding.liquidateContractBtn.setOnClickListener {
+            Log.i("ContractDetailActivity", "Liquidate button clicked")
+            val addressAssicuratoresafe = addressAssicuratore ?: ""
+            val premiotoBigInteger = premio?.toBigIntegerOrNull() ?: BigInteger.ZERO
+            val addressContractSafe = address ?: ""
+            if (addressAssicuratoresafe.isEmpty() || premiotoBigInteger == BigInteger.ZERO
+                || addressContractSafe.isEmpty()) {
+                Log.wtf("ContractDetailActivity", "Invalid addresses or premio")
+                return@setOnClickListener
+            }
+            lifecycleScope.launch {
+                progression.visibility = View.VISIBLE
+                try{
+                    val approvehash = blockChainCalls.approveTokenTransfer(addressAssicuratoresafe,premiotoBigInteger)
+                    val recipt = blockChainCalls.waitForReceipt(approvehash)
+                    if (recipt.status == "0x1") {
+                        Log.d("ContractDetailActivity", "Token transfer approved successfully")
+                    } else {
+                        Log.e("ContractDetailActivity", "Token transfer approval failed")
+                        progression.visibility = View.GONE
+                        return@launch
+                    }
+                }
+                catch (e: Exception) {
+                    Log.e("ContractDetailActivity", "Error during liquidation process", e)
+                }
+                try {
+                    val fundhash = contractCalls.fundContract(addressContractSafe)
+                    val recipt = blockChainCalls.waitForReceipt(fundhash)
+                    if (recipt.status == "0x1") {
+                        Log.d("ContractDetailActivity", "Contract funded successfully")
+                    } else {
+                        Log.e("ContractDetailActivity", "Contract funding failed")
+                        progression.visibility = View.GONE
+                        return@launch
+                    }
+                }
+                catch (e: Exception) {
+                    Log.e("ContractDetailActivity", "Error during liquidation process", e)
+                    progression.visibility = View.GONE
+                }
+            }
+            progression.visibility = View.GONE
+        }
+
+        binding.activateContractbtn.setOnClickListener {
+            Log.i("ContractDetailActivity", "Activate button clicked")
+        }
+        binding.fundContractbtn.setOnClickListener {
+            Log.i("ContractDetailActivity", "Fund button clicked")
+        }
     }
 }

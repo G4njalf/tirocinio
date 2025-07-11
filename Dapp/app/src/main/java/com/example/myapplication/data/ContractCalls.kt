@@ -30,6 +30,7 @@ class DynamicAddressArray(addresses: List<Address>) : DynamicArray<Address>(Addr
 
 private val infuraurl ="https://sepolia.infura.io/v3/3e885576a998490992a7cdaa69e2ed2f"
 private val web3 = Web3j.build(HttpService(infuraurl))
+//HARDCODE DA TOGLIERE PRIMA O POI
 private val myAddress = "0x8C6b618aC0b1E69FA7FF02Ec2a8EB6caDC29bc86"
 private val tokenAddress = "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f"
 private val factoryAddress = "0x436876eEbf100db46c32a780A65121B8fdF758Aa"
@@ -69,6 +70,53 @@ class BlockChainCalls{
         throw Exception("Transaction receipt not found") // Gestione del caso in cui il ciclo non restituisce mai un valore
     }
 
+    suspend fun approveTokenTransfer(spenderAddress: String, amount: BigInteger)
+    : String = withContext(Dispatchers.IO) {
+
+        val function = Function(
+            "approve",
+            listOf(Address(spenderAddress), Uint256(amount)),
+            listOf(TypeReference.create(org.web3j.abi.datatypes.Bool::class.java))
+        )
+
+        val encodedFunction = FunctionEncoder.encode(function)
+
+        val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
+        val nonce = web3.ethGetTransactionCount(myAddress, DefaultBlockParameterName.PENDING)
+            .send().transactionCount
+
+        val baseGasPrice = web3.ethGasPrice().send().gasPrice
+        val gasPrice = baseGasPrice.multiply(BigInteger.valueOf(120)).divide(BigInteger.valueOf(100)) // 20% more than the base gas price
+        val gasLimit = BigInteger.valueOf(1_500_000L) // per ora cosi
+
+        val transaction = RawTransaction.createTransaction(
+            nonce,
+            gasPrice,
+            gasLimit,
+            tokenAddress,
+            encodedFunction
+        )
+
+        Log.d("","chainId: ${web3.ethChainId().send().chainId.toLong()}")
+
+        val signedTransaction = TransactionEncoder.signMessage(
+            transaction,
+            web3.ethChainId().send().chainId.toLong(), // Sepolia chain ID
+            credentials
+        )
+
+        val hexValue = Numeric.toHexString(signedTransaction)
+
+        val response = web3.ethSendRawTransaction(hexValue).send()
+
+        if (response.hasError()) {
+            Log.e("approveTokenTransfer", "Transaction error: ${response.error.message}")
+            throw Exception("Token approval failed: ${response.error.message}")
+        }
+
+        return@withContext response.transactionHash
+    }
+
 }
 
 
@@ -100,8 +148,7 @@ class ContractCalls {
     suspend fun createNewContract(addrAssicurato: String, premio: Uint256): String = withContext(Dispatchers.IO){
 
         val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
-        Log.d("a", "a ${Address(addrAssicurato)}")
-        Log.d("a", "a ${premio.value}")
+
         val nonce = web3.ethGetTransactionCount(myAddress, DefaultBlockParameterName.PENDING)
             .send().transactionCount
 
@@ -245,6 +292,12 @@ class ContractCalls {
             listOf(TypeReference.create(Address::class.java))
         )
 
+        val versionFunction = Function(
+            "version",
+            emptyList(),
+            listOf(TypeReference.create(Utf8String::class.java))
+        )
+
         val functions = listOf(
             "assicuratore" to assicuratoreFunction,
             "assicurato" to assicuratoFunction,
@@ -252,7 +305,8 @@ class ContractCalls {
             "liquidato" to liquidatoFunction,
             "attivato" to attivatoFunction,
             "funded" to fundedFunction,
-            "token" to tokenFunction
+            "token" to tokenFunction,
+            "version" to versionFunction
         )
 
         val results = mutableMapOf<String, Any>()
@@ -277,24 +331,65 @@ class ContractCalls {
 
     // Function to fund the insurance contract ( l assicuratore deve inviare i fondi al contratto)
 
-    suspend fun fundContract(contractAddress: String): Boolean = withContext(Dispatchers.IO){
+    suspend fun fundContract(contractAddress: String): String = withContext(Dispatchers.IO){
+
+        val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
+
+        val nonce = web3.ethGetTransactionCount(myAddress, DefaultBlockParameterName.PENDING)
+            .send().transactionCount
+
+        val basegasPrice = web3.ethGasPrice().send().gasPrice
+        val gasPrice = basegasPrice.multiply(BigInteger.valueOf(120)).divide(BigInteger.valueOf(100)) // 20% more than the base gas price
+        val gasLimit = BigInteger.valueOf(1_500_000L) // per ora cosi
+
         val function = Function(
             "fundContract",
             emptyList(),
             emptyList() // output type
         )
         val encodedFunction = FunctionEncoder.encode(function)
-        val response = web3.ethCall(
-            Transaction.createEthCallTransaction(myAddress, contractAddress, encodedFunction),
-            DefaultBlockParameterName.LATEST
-        ).send()
 
-        return@withContext true
+        val transaction = RawTransaction.createTransaction(
+            nonce,
+            gasPrice,
+            gasLimit,
+            contractAddress,
+            encodedFunction
+        )
+
+        val signedTransaction = TransactionEncoder.signMessage(
+            transaction,
+            web3.ethChainId().send().chainId.toLong(), // Sepolia chain ID
+            credentials
+        )
+
+        val hexValue = Numeric.toHexString(signedTransaction)
+
+        val response = web3.ethSendRawTransaction(hexValue).send()
+
+        if (response.hasError()) {
+            Log.e("fundContract", "Transaction error: ${response.error.message}")
+            throw Exception("Funding contract failed: ${response.error.message}")
+        }
+
+        val txHash = response.transactionHash
+
+        return@withContext txHash
     }
 
     // Function to pay the ensured
 
-    suspend fun liquidateContract(contractAddress: String) : Boolean = withContext(Dispatchers.IO) {
+    suspend fun liquidateContract(contractAddress: String , callerAddress: String) : String = withContext(Dispatchers.IO) {
+
+        val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicurato)
+
+        val nonce = web3.ethGetTransactionCount(callerAddress, DefaultBlockParameterName.PENDING)
+            .send().transactionCount
+
+        val basegasPrice = web3.ethGasPrice().send().gasPrice
+        val gasPrice = basegasPrice.multiply(BigInteger.valueOf(120)).divide(BigInteger.valueOf(100)) // 20% more than the base gas price
+        val gasLimit = BigInteger.valueOf(1_500_000L) // per ora cosi
+
         val function = Function(
             "liquidazione",
             emptyList(),
@@ -303,17 +398,47 @@ class ContractCalls {
 
         val encodedFunction = FunctionEncoder.encode(function)
 
-        val response = web3.ethCall(
-            Transaction.createEthCallTransaction(myAddress, contractAddress, encodedFunction),
-            DefaultBlockParameterName.LATEST
-        ).send()
+        val transaction = RawTransaction.createTransaction(
+            nonce,
+            gasPrice,
+            gasLimit,
+            contractAddress,
+            encodedFunction
+        )
 
-        return@withContext true
+        val signedTransaction = TransactionEncoder.signMessage(
+            transaction,
+            web3.ethChainId().send().chainId.toLong(), // Sepolia chain ID
+            credentials
+        )
+
+        val hexValue = Numeric.toHexString(signedTransaction)
+
+        val response = web3.ethSendRawTransaction(hexValue).send()
+
+        if (response.hasError()) {
+            Log.e("createNewContract", "Transaction error: ${response.error.message}")
+            throw Exception("Smart contract creation failed: ${response.error.message}")
+        }
+
+        val txHash = response.transactionHash
+
+        return@withContext txHash
     }
 
     // Function to activate the insurance contract
 
-    suspend fun activateContract(contractAddress: String, insuredAddress: String): Boolean = withContext(Dispatchers.IO) {
+    suspend fun activateContract(contractAddress: String, insuredAddress: String): String = withContext(Dispatchers.IO) {
+
+        val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicurato)
+
+        val nonce = web3.ethGetTransactionCount(insuredAddress, DefaultBlockParameterName.PENDING)
+            .send().transactionCount
+
+        val basegasPrice = web3.ethGasPrice().send().gasPrice
+        val gasPrice = basegasPrice.multiply(BigInteger.valueOf(120)).divide(BigInteger.valueOf(100)) // 20% more than the base gas price
+        val gasLimit = BigInteger.valueOf(1_500_000L) // per ora cosi
+
         val function = Function(
             "activateContract",
             emptyList(),
@@ -322,11 +447,32 @@ class ContractCalls {
 
         val encodedFunction = FunctionEncoder.encode(function)
 
-        val response = web3.ethCall(
-            Transaction.createEthCallTransaction(insuredAddress, contractAddress, encodedFunction),
-            DefaultBlockParameterName.LATEST
-        ).send()
+        val transaction = RawTransaction.createTransaction(
+            nonce,
+            gasPrice,
+            gasLimit,
+            factoryAddress,
+            encodedFunction
+        )
 
-        return@withContext true
+        val signedTransaction = TransactionEncoder.signMessage(
+            transaction,
+            web3.ethChainId().send().chainId.toLong(), // Sepolia chain ID
+            credentials
+        )
+
+        val hexValue = Numeric.toHexString(signedTransaction)
+
+        val response = web3.ethSendRawTransaction(hexValue).send()
+
+        if (response.hasError()) {
+            Log.e("createNewContract", "Transaction error: ${response.error.message}")
+            throw Exception("Smart contract creation failed: ${response.error.message}")
+        }
+
+        val txHash = response.transactionHash
+
+        return@withContext txHash
     }
 }
+

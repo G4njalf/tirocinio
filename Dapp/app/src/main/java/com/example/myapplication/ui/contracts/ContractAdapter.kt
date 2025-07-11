@@ -21,8 +21,8 @@ data class Contract(
 class ContractAdapter(private val contractList: List<Contract>):RecyclerView.Adapter<ContractAdapter.ContractViewHolder>() {
 
     class ContractViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val premioText: TextView = itemView.findViewById(R.id.premioText)
         val addressText: TextView = itemView.findViewById(R.id.addressText)
-        val titleText: TextView = itemView.findViewById(R.id.titleText)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContractViewHolder {
@@ -33,8 +33,8 @@ class ContractAdapter(private val contractList: List<Contract>):RecyclerView.Ada
 
     override fun onBindViewHolder(holder: ContractViewHolder, position: Int) {
         val contract = contractList[position]
-        holder.addressText.text = contract.address
-        holder.titleText.text = "${contract.premio} !"
+        holder.addressText.text = "contract : ${contract.address}"
+        holder.premioText.text = "value : ${contract.premio}"
 
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context

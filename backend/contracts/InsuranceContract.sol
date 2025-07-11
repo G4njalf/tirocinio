@@ -10,6 +10,7 @@ contract InsuranceContract {
     bool public attivato;
     bool public funded;
     IERC20 public token; // ERC20 token
+    string public version = "0.1";
     event Liquidation(
         address contractAddress,
         address indexed assicurato,
@@ -58,7 +59,7 @@ contract InsuranceContract {
         emit Funded(address(this), assicurato, assicuratore, premio, true);
     }
 
-    function liquidazione() external onlyInsurer {
+    function liquidazione() external onlyInsured {
         /* premo verifica manuale dall app -> parte sta funzione -> interroga un contratto che mi devono dare l abi
             l abi mi da un threshold -> controllo, se ok liquido
             quando cho l abi poi vedo come farlo 

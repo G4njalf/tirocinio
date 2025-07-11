@@ -38,13 +38,22 @@ class ContractsViewModel (application: Application) : AndroidViewModel(applicati
         }
         viewModelScope.launch {
             try {
-                val contractAddresses = contractCalls.getInsuranceContractsByInsured(userAddress)
+                val contractAddresses: List<String> = when (userRole) {
+                    "cliente" -> contractCalls.getInsuranceContractsByInsured(userAddress)
+                    "assicuratore" -> contractCalls.getAllInsuranceContracts()
+                    else -> emptyList()
+                }
                 val contractList = mutableListOf<Contract>()
                 for (address in contractAddresses){
                     val data = contractCalls.getContractVariables(address)
                     Log.d("data", "Contract data for $address: $data")
-                    if (data["assicurato"].toString() != userAddress.lowercase()){ // normalizzo userAddress perche me li da tutto minuscolo dall bc
+                    if (data["assicurato"].toString() != userAddress.lowercase() && (userRole == "cliente")){ // normalizzo userAddress perche me li da tutto minuscolo dall bc
                         Log.wtf("loadContracts", "Contract $address is not associated with the user address $userAddress")
+                    }
+                    val version = data["version"]?.toString() ?: "unknown"
+                    if (version != "0.1" && false) { // bypasso il controllo della versione per ora
+                        Log.i("loadContracts", "Contract $address is not version 0.1, skipping")
+                        continue // skip contracts that are not version 1.0
                     }
                     contractRepository.addContract(
                         address,

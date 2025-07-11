@@ -10,7 +10,7 @@
 
     <!-- Titolo del contratto -->
     <TextView
-        android:id="@+id/titleText"
+        android:id="@+id/addressText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Titolo Contratto"
@@ -23,7 +23,7 @@
 
     <!-- Indirizzo del contratto -->
     <TextView
-        android:id="@+id/addressText"
+        android:id="@+id/premioText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="0x1234567890abcdef1234567890abcdef12345678"
@@ -31,7 +31,7 @@
         android:textColor="@android:color/darker_gray"
         android:maxLines="1"
         android:ellipsize="end"
-        app:layout_constraintTop_toBottomOf="@id/titleText"
+        app:layout_constraintTop_toBottomOf="@id/addressText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />

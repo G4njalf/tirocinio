@@ -75,4 +75,48 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addressAssicuratoTextView" />
 
+    <Button
+        android:id="@+id/activateContractbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Attiva Contratto"
+        app:layout_constraintBottom_toTopOf="@+id/fundContractbtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addressAssicuratoreTextView" />
+
+    <Button
+        android:id="@+id/fundContractbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:layout_marginBottom="32dp"
+        android:text="Fonda Contratto"
+        app:layout_constraintBottom_toTopOf="@+id/liquidateContractBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activateContractbtn" />
+
+    <Button
+        android:id="@+id/liquidateContractBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Liquida Contratto"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarDetail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fundContractbtn" />
+
+    <ProgressBar
+        android:id="@+id/progressBarDetail"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
