@@ -9,63 +9,70 @@
         android:id="@+id/addressTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="92dp"
         android:text="Address:"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/premioTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="31dp"
         android:text="Premio:"
-        app:layout_constraintTop_toBottomOf="@id/addressTextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/addressTextView" />
 
     <TextView
         android:id="@+id/isLiquidatoTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="31dp"
         android:text="Liquidato:"
-        app:layout_constraintTop_toBottomOf="@id/premioTextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/premioTextView" />
 
     <TextView
         android:id="@+id/isAttivatoTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="31dp"
         android:text="Attivato:"
-        app:layout_constraintTop_toBottomOf="@id/isLiquidatoTextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/isLiquidatoTextView" />
 
     <TextView
         android:id="@+id/isFundendTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="31dp"
         android:text="Fundend:"
-        app:layout_constraintTop_toBottomOf="@id/isAttivatoTextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/isAttivatoTextView" />
 
     <TextView
         android:id="@+id/addressAssicuratoTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="31dp"
         android:text="Assicurato:"
-        app:layout_constraintTop_toBottomOf="@id/isFundendTextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/isFundendTextView" />
 
     <TextView
         android:id="@+id/addressAssicuratoreTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="31dp"
         android:text="Assicuratore:"
-        app:layout_constraintTop_toBottomOf="@id/addressAssicuratoTextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/addressAssicuratoTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

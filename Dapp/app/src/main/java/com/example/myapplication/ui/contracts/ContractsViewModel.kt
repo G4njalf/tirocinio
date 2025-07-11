@@ -12,6 +12,8 @@ import com.example.myapplication.data.BlockChainCalls
 import com.example.myapplication.data.ContractCalls
 import kotlinx.coroutines.launch
 import com.example.myapplication.data.ContractRepository
+import java.math.BigInteger
+
 
 class ContractsViewModel (application: Application) : AndroidViewModel(application){
 
@@ -31,26 +33,41 @@ class ContractsViewModel (application: Application) : AndroidViewModel(applicati
     fun loadContracts(){
         if (contractRepository.contractAddresses.value?.isNotEmpty() == true) {
             // If contracts are already loaded, no need to fetch again
+            _contracts.value = contractRepository.contractData.value
             return
         }
         viewModelScope.launch {
             try {
                 val contractAddresses = contractCalls.getInsuranceContractsByInsured(userAddress)
+                val contractList = mutableListOf<Contract>()
                 for (address in contractAddresses){
                     val data = contractCalls.getContractVariables(address)
-                    if (data["assicurato"].toString() != userAddress){
+                    Log.d("data", "Contract data for $address: $data")
+                    if (data["assicurato"].toString() != userAddress.lowercase()){ // normalizzo userAddress perche me li da tutto minuscolo dall bc
                         Log.wtf("loadContracts", "Contract $address is not associated with the user address $userAddress")
                     }
                     contractRepository.addContract(
                         address,
-                        data["premio"] as UInt,
+                        (data["premio"] as BigInteger).toInt().toUInt(),
                         data["liquidato"] as Boolean,
                         data["attivato"] as Boolean,
                         data["funded"] as Boolean,
                         data["assicurato"] as String,
                         data["assicuratore"] as String
                     )
+                    contractList.add(
+                        Contract(
+                            address,
+                            (data["premio"] as BigInteger).toInt().toUInt(),
+                            data["liquidato"] as Boolean,
+                            data["attivato"] as Boolean,
+                            data["funded"] as Boolean,
+                            data["assicurato"] as String,
+                            data["assicuratore"] as String
+                        )
+                    )
                 }
+                _contracts.postValue(contractList) // prendo i dati dalla copia locale per evitare che la repo non sia ancora aggioranta
             }
             catch (e: Exception) {
                 Log.e("ContractsViewModel", "Error loading contract addresses", e)

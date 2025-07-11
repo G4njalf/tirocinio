@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Log
+import android.widget.Toast
 import com.example.myapplication.data.BlockChainCalls
 import com.example.myapplication.data.ContractCalls
 import androidx.lifecycle.viewModelScope
@@ -88,6 +89,7 @@ class ContractCreationViewModel : ViewModel() {
                 Log.e("ContractCreationViewModel", "Invalid address: $address")
             }
             _isLoading.value = false
+
         }
     }
 

@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.contracts
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,9 +33,13 @@ class ContractsFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        contractViewModel.loadContracts()
+        val emptyAdapter = ContractAdapter(emptyList())
+        recyclerView.adapter = emptyAdapter
 
+        contractViewModel.loadContracts()
+        Log.d("ContractsFragment", "aaa")
         contractViewModel.contracts.observe(viewLifecycleOwner) { contratti ->
+            Log.d("ContractsFragment", "ContractsFragment: Loaded contracts: $contratti")
             val adapter = ContractAdapter(contratti)
             recyclerView.adapter = adapter
         }
