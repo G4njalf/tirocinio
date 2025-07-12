@@ -10,6 +10,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import com.example.myapplication.data.BlockChainCalls
+import java.math.BigInteger
 
 
 class HomeViewModel(application: Application) : AndroidViewModel(application){
@@ -25,13 +27,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
     val text2: LiveData<String> = _text2
 
     private val contractCalls = ContractCalls()
+    private val blockChainCalls = BlockChainCalls()
 
 
     fun getDataFromSepolia(){
         Log.d("Role", "User role is: $userRole , User address is: $userAddress")
         viewModelScope.launch {
             try {
-                val balance = contractCalls.getTokenBalance()
+                val balance = contractCalls.getTokenBalance(userAddress?: "")
                 _text2.value = "Balance: $balance"
             }
             catch (e: Exception) {
@@ -40,6 +43,23 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
             }
         }
 
+    }
+
+    fun mintTokens(){
+        Log.d("HomeViewModel", "Minting tokens for user address: $userAddress")
+        viewModelScope.launch {
+            try {
+                val hashmint = blockChainCalls.mintTokens(userAddress ?: "", BigInteger.valueOf(100000)) // Minting 100000 tokens
+                val recipt = blockChainCalls.waitForReceipt(hashmint)
+                if (recipt.status == "0x1") {
+                    Log.d("HomeViewModel", "Tokens minted successfully: $hashmint")
+                } else {
+                    Log.e("HomeViewModel", "Token minting failed: $hashmint")
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error minting tokens", e)
+            }
+        }
     }
 
 

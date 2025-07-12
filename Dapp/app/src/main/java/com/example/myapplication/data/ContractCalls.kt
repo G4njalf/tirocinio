@@ -70,7 +70,7 @@ class BlockChainCalls{
         throw Exception("Transaction receipt not found") // Gestione del caso in cui il ciclo non restituisce mai un valore
     }
 
-    suspend fun approveTokenTransfer(spenderAddress: String, amount: BigInteger)
+    suspend fun approveTokenTransfer(userAddress: String,spenderAddress: String, amount: BigInteger, role: String )
     : String = withContext(Dispatchers.IO) {
 
         val function = Function(
@@ -81,8 +81,11 @@ class BlockChainCalls{
 
         val encodedFunction = FunctionEncoder.encode(function)
 
-        val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
-        val nonce = web3.ethGetTransactionCount(myAddress, DefaultBlockParameterName.PENDING)
+        var credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
+        if (role == "cliente"){
+            credentials = org.web3j.crypto.Credentials.create(privateKeyAssicurato)
+        }
+        val nonce = web3.ethGetTransactionCount(userAddress, DefaultBlockParameterName.PENDING)
             .send().transactionCount
 
         val baseGasPrice = web3.ethGasPrice().send().gasPrice
@@ -117,6 +120,50 @@ class BlockChainCalls{
         return@withContext response.transactionHash
     }
 
+    suspend fun mintTokens(reciver: String, amount: BigInteger) : String = withContext(Dispatchers.IO) {
+
+        val function = Function(
+            "mint",
+            listOf(Address(reciver), Uint256(amount)),
+            emptyList()
+        )
+
+        val encodedFunction = FunctionEncoder.encode(function)
+
+        val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
+        val nonce = web3.ethGetTransactionCount(myAddress, DefaultBlockParameterName.PENDING)
+            .send().transactionCount
+
+        val baseGasPrice = web3.ethGasPrice().send().gasPrice
+        val gasPrice = baseGasPrice.multiply(BigInteger.valueOf(120)).divide(BigInteger.valueOf(100)) // 20% more than the base gas price
+        val gasLimit = BigInteger.valueOf(1_500_000L) // per ora cosi
+
+        val transaction = RawTransaction.createTransaction(
+            nonce,
+            gasPrice,
+            gasLimit,
+            tokenAddress,
+            encodedFunction
+        )
+
+        val signedTransaction = TransactionEncoder.signMessage(
+            transaction,
+            web3.ethChainId().send().chainId.toLong(), // Sepolia chain ID
+            credentials
+        )
+
+        val hexValue = Numeric.toHexString(signedTransaction)
+
+        val response = web3.ethSendRawTransaction(hexValue).send()
+
+        if (response.hasError()) {
+            Log.e("mintTokens", "Transaction error: ${response.error.message}")
+            throw Exception("Token minting failed: ${response.error.message}")
+        }
+
+        return@withContext response.transactionHash
+    }
+
 }
 
 
@@ -124,17 +171,17 @@ class ContractCalls {
 
     // Function to get the token balance of the user's address
 
-    suspend fun getTokenBalance(): String = withContext(Dispatchers.IO) {
+    suspend fun getTokenBalance(address: String): String = withContext(Dispatchers.IO) {
         val function = Function(
             "balanceOf",
-            listOf(Address(myAddress)),
+            listOf(Address(address)),
             listOf(TypeReference.create(org.web3j.abi.datatypes.generated.Uint256::class.java))
         )
 
         val encodedFunction = FunctionEncoder.encode(function)
 
         val response = web3.ethCall(
-            Transaction.createEthCallTransaction(myAddress, tokenAddress, encodedFunction),
+            Transaction.createEthCallTransaction(address, tokenAddress, encodedFunction),
             DefaultBlockParameterName.LATEST
         ).send()
 
@@ -366,6 +413,8 @@ class ContractCalls {
         val hexValue = Numeric.toHexString(signedTransaction)
 
         val response = web3.ethSendRawTransaction(hexValue).send()
+
+        Log.d("fundContract", "Transaction sent: $hexValue, txHash: ${response.transactionHash}")
 
         if (response.hasError()) {
             Log.e("fundContract", "Transaction error: ${response.error.message}")

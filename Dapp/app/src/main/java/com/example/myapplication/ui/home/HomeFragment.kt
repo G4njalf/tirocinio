@@ -37,6 +37,10 @@ class HomeFragment : Fragment() {
             homeViewModel.getDataFromSepolia()
         }
 
+        binding.buttonMintTkn.setOnClickListener {
+            homeViewModel.mintTokens()
+        }
+
         return root
     }
     override fun onDestroyView() {

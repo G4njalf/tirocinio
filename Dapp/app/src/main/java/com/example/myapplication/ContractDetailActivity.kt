@@ -77,37 +77,23 @@ class ContractDetailActivity : AppCompatActivity() {
 
         binding.liquidateContractBtn.setOnClickListener {
             Log.i("ContractDetailActivity", "Liquidate button clicked")
-            val addressAssicuratoresafe = addressAssicuratore ?: ""
+            val addressAssicuratosafe = addressAssicurato ?: ""
             val premiotoBigInteger = premio?.toBigIntegerOrNull() ?: BigInteger.ZERO
             val addressContractSafe = address ?: ""
-            if (addressAssicuratoresafe.isEmpty() || premiotoBigInteger == BigInteger.ZERO
+            if (addressAssicuratosafe.isEmpty() || premiotoBigInteger == BigInteger.ZERO
                 || addressContractSafe.isEmpty()) {
                 Log.wtf("ContractDetailActivity", "Invalid addresses or premio")
                 return@setOnClickListener
             }
             lifecycleScope.launch {
                 progression.visibility = View.VISIBLE
-                try{
-                    val approvehash = blockChainCalls.approveTokenTransfer(addressAssicuratoresafe,premiotoBigInteger)
-                    val recipt = blockChainCalls.waitForReceipt(approvehash)
-                    if (recipt.status == "0x1") {
-                        Log.d("ContractDetailActivity", "Token transfer approved successfully")
-                    } else {
-                        Log.e("ContractDetailActivity", "Token transfer approval failed")
-                        progression.visibility = View.GONE
-                        return@launch
-                    }
-                }
-                catch (e: Exception) {
-                    Log.e("ContractDetailActivity", "Error during liquidation process", e)
-                }
                 try {
-                    val fundhash = contractCalls.fundContract(addressContractSafe)
-                    val recipt = blockChainCalls.waitForReceipt(fundhash)
+                    val liquidatehash = contractCalls.liquidateContract(addressContractSafe, addressAssicuratosafe)
+                    val recipt = blockChainCalls.waitForReceipt(liquidatehash)
                     if (recipt.status == "0x1") {
-                        Log.d("ContractDetailActivity", "Contract funded successfully")
+                        Log.d("ContractDetailActivity", "Contract liquidated successfully")
                     } else {
-                        Log.e("ContractDetailActivity", "Contract funding failed")
+                        Log.e("ContractDetailActivity", "Contract liquidation failed")
                         progression.visibility = View.GONE
                         return@launch
                     }
@@ -122,9 +108,94 @@ class ContractDetailActivity : AppCompatActivity() {
 
         binding.activateContractbtn.setOnClickListener {
             Log.i("ContractDetailActivity", "Activate button clicked")
+            val addressAssicuratosafe = addressAssicurato ?: ""
+            val premiotoBigInteger = premio?.toBigIntegerOrNull() ?: BigInteger.ZERO
+            val activateamountsafe = premiotoBigInteger * BigInteger.valueOf(5) / BigInteger.valueOf(100)
+            val addressContractSafe = address ?: ""
+            lifecycleScope.launch {
+                progression.visibility = View.VISIBLE
+                try{
+                    val approvehash = blockChainCalls.approveTokenTransfer(addressAssicuratosafe,addressContractSafe,activateamountsafe,userRole?:"")
+                    val recipt = blockChainCalls.waitForReceipt(approvehash)
+                    if (recipt.status == "0x1") {
+                        Log.d("ContractDetailActivity", "Token transfer approved successfully")
+                    } else {
+                        Log.e("ContractDetailActivity", "Token transfer approval failed")
+                        progression.visibility = View.GONE
+                        return@launch
+                    }
+                }
+                catch (e: Exception) {
+                    Log.e("ContractDetailActivity", "Error during activation process", e)
+                }
+                try {
+                    val activateHash = contractCalls.activateContract(addressContractSafe,addressAssicuratosafe)
+                    val recipt = blockChainCalls.waitForReceipt(activateHash)
+                    if (recipt.status == "0x1") {
+                        Log.d("ContractDetailActivity", "Contract activated successfully")
+                    } else {
+                        Log.e("ContractDetailActivity", "Contract activation failed")
+                        progression.visibility = View.GONE
+                        return@launch
+                    }
+                }
+                catch (e: Exception) {
+                    Log.e("ContractDetailActivity", "Error during activation process", e)
+                    progression.visibility = View.GONE
+                }
+            }
+            progression.visibility = View.GONE
         }
+
+
         binding.fundContractbtn.setOnClickListener {
-            Log.i("ContractDetailActivity", "Fund button clicked")
+            Log.i("ContractDetailActivity", "Found button clicked")
+            val addressAssicuratoresafe = addressAssicuratore ?: ""
+            val premiotoBigInteger = premio?.toBigIntegerOrNull() ?: BigInteger.ZERO
+            val addressContractSafe = address ?: ""
+            Log.d("ContractDetailActivity", "Assicuratore: $addressAssicuratoresafe, Premio: $premiotoBigInteger, Contract: $addressContractSafe")
+            if (addressAssicuratoresafe.isEmpty() || premiotoBigInteger == BigInteger.ZERO
+                || addressContractSafe.isEmpty()
+            ) {
+                Log.wtf("ContractDetailActivity", "Invalid addresses or premio")
+                return@setOnClickListener
+            }
+            lifecycleScope.launch {
+                progression.visibility = View.VISIBLE
+                try {
+                    val approvehash = blockChainCalls.approveTokenTransfer(
+                        addressAssicuratoresafe,
+                        addressContractSafe,
+                        premiotoBigInteger,
+                        userRole ?: ""
+                    )
+                    val recipt = blockChainCalls.waitForReceipt(approvehash)
+                    if (recipt.status == "0x1") {
+                        Log.d("ContractDetailActivity", "Token transfer approved successfully")
+                    } else {
+                        Log.e("ContractDetailActivity", "Token transfer approval failed")
+                        progression.visibility = View.GONE
+                        return@launch
+                    }
+                } catch (e: Exception) {
+                    Log.e("ContractDetailActivity", "Error during funding process", e)
+                }
+                try {
+                    val fundhash = contractCalls.fundContract(addressContractSafe)
+                    val recipt = blockChainCalls.waitForReceipt(fundhash)
+                    if (recipt.status == "0x1") {
+                        Log.d("ContractDetailActivity", "Contract funded successfully")
+                    } else {
+                        Log.e("ContractDetailActivity", "Contract funding failed with recipt: $recipt")
+                        progression.visibility = View.GONE
+                        return@launch
+                    }
+                } catch (e: Exception) {
+                    Log.e("ContractDetailActivity", "Error during funding process", e)
+                    progression.visibility = View.GONE
+                }
+            }
+            progression.visibility = View.GONE
         }
     }
 }
