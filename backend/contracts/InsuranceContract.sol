@@ -90,7 +90,7 @@ contract InsuranceContract {
     modifier onlyInsurer() {
         require(
             msg.sender == assicuratore,
-            "Only the insurer can call this function"
+            "Only the insurer can call this function!"
         );
         _;
     }
@@ -98,7 +98,7 @@ contract InsuranceContract {
     modifier onlyInsured() {
         require(
             msg.sender == assicurato,
-            "Only the insured can call this function"
+            "Only the insured can call this function!"
         );
         _;
     }
