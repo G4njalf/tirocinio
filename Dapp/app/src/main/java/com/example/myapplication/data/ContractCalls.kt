@@ -33,7 +33,7 @@ private val web3 = Web3j.build(HttpService(infuraurl))
 //HARDCODE DA TOGLIERE PRIMA O POI
 private val myAddress = "0x8C6b618aC0b1E69FA7FF02Ec2a8EB6caDC29bc86"
 private val tokenAddress = "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f"
-private val factoryAddress = "0x436876eEbf100db46c32a780A65121B8fdF758Aa"
+private val factoryAddress = "0xAc12bd15e865e156bC712aeeaC6E6092b53BA6D3"
 private val privateKeyAssicuratore = "REMOVED" // non ci sono soldi veri non rubatemi i fondi :D
 private val privateKeyAssicurato = "REMOVED" // non ci sono soldi veri non rubatemi i fondi :D
 
@@ -500,7 +500,7 @@ class ContractCalls {
             nonce,
             gasPrice,
             gasLimit,
-            factoryAddress,
+            contractAddress,
             encodedFunction
         )
 

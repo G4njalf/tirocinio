@@ -90,6 +90,7 @@ class ContractDetailActivity : AppCompatActivity() {
                 try {
                     val liquidatehash = contractCalls.liquidateContract(addressContractSafe, addressAssicuratosafe)
                     val recipt = blockChainCalls.waitForReceipt(liquidatehash)
+                    Log.d("ContractDetailActivity", "Recipt: $recipt")
                     if (recipt.status == "0x1") {
                         Log.d("ContractDetailActivity", "Contract liquidated successfully")
                     } else {
@@ -131,6 +132,7 @@ class ContractDetailActivity : AppCompatActivity() {
                 try {
                     val activateHash = contractCalls.activateContract(addressContractSafe,addressAssicuratosafe)
                     val recipt = blockChainCalls.waitForReceipt(activateHash)
+                    Log.d("ContractDetailActivity", "Recipt: $recipt")
                     if (recipt.status == "0x1") {
                         Log.d("ContractDetailActivity", "Contract activated successfully")
                     } else {
@@ -183,6 +185,7 @@ class ContractDetailActivity : AppCompatActivity() {
                 try {
                     val fundhash = contractCalls.fundContract(addressContractSafe)
                     val recipt = blockChainCalls.waitForReceipt(fundhash)
+                    Log.d("ContractDetailActivity", "Recipt: $recipt")
                     if (recipt.status == "0x1") {
                         Log.d("ContractDetailActivity", "Contract funded successfully")
                     } else {
