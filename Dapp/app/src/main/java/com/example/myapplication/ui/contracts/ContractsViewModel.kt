@@ -29,11 +29,18 @@ class ContractsViewModel (application: Application) : AndroidViewModel(applicati
 
     private val contractRepository = ContractRepository()
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
 
     fun loadContracts(){
-        if (contractRepository.contractAddresses.value?.isNotEmpty() == true) {
+        _isLoading.value  = true
+        if (contractRepository.contractData.value?.isNotEmpty() == true && false) {
             // If contracts are already loaded, no need to fetch again
+            // secondo me non serve perche e meglio controllare sempre se ci sono nuovi contratti
             _contracts.value = contractRepository.contractData.value
+            Log.d("ContractsViewModel", "Contracts already loaded, skipping fetch")
+            _isLoading.value = false
             return
         }
         viewModelScope.launch {
@@ -80,7 +87,9 @@ class ContractsViewModel (application: Application) : AndroidViewModel(applicati
             }
             catch (e: Exception) {
                 Log.e("ContractsViewModel", "Error loading contract addresses", e)
+                _contracts.postValue(emptyList())
             }
+            _isLoading.value = false
         }
     }
 }

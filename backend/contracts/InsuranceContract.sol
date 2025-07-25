@@ -62,7 +62,7 @@ contract InsuranceContract {
     function liquidazione() external onlyInsured {
         /* premo verifica manuale dall app -> parte sta funzione -> interroga un contratto che mi devono dare l abi
             l abi mi da un threshold -> controllo, se ok liquido
-            quando cho l abi poi vedo come farlo 
+            quando cho l abi poi vedo come farlo                                                  
         */
         require(!liquidato, "Already liquidated");
         require(attivato, "Contract not activated yet");

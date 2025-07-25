@@ -39,8 +39,10 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/DISCLAIMER"
+            excludes += "/META-INF/versions/9/OSGI-INF/MANIFEST.MF"
         }
     }
+
 }
 
 dependencies {
@@ -60,4 +62,9 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("org.web3j:core:4.9.4")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation(platform("com.reown:android-bom:1.4.5"))
+    implementation("com.reown:android-core")
+    implementation("com.reown:appkit")
+    implementation ("io.github.cdimascio:dotenv-kotlin:6.4.1")
+
 }

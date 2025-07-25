@@ -74,6 +74,8 @@ class MainActivity : AppCompatActivity() {
             menu.findItem(R.id.nav_contract_creation).isVisible = false
         }
 
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -29,6 +29,12 @@ class ContractsFragment : Fragment() {
         _binding = FragmentContractsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        binding.progressBarContracts.visibility = View.GONE
+
+        contractViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBarContracts.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
         val recyclerView = binding.recyclerView
 
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -44,7 +50,7 @@ class ContractsFragment : Fragment() {
             recyclerView.adapter = adapter
         }
 
-        // cose qui
+
 
         return root
     }

@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="31dp"
-        android:text="Premio:"
+        android:text="Premium:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addressTextView" />
 
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="31dp"
-        android:text="Liquidato:"
+        android:text="Liquidated:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/premioTextView" />
 
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="31dp"
-        android:text="Attivato:"
+        android:text="Activated:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/isLiquidatoTextView" />
 
@@ -61,7 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="31dp"
-        android:text="Assicurato:"
+        android:text="Ensured:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/isFundendTextView" />
 
@@ -71,7 +71,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="31dp"
-        android:text="Assicuratore:"
+        android:text="Ensurer:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addressAssicuratoTextView" />
 
@@ -79,7 +79,7 @@
         android:id="@+id/activateContractbtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Attiva Contratto"
+        android:text="Activate Contract"
         app:layout_constraintBottom_toTopOf="@+id/fundContractbtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -91,7 +91,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="26dp"
         android:layout_marginBottom="32dp"
-        android:text="Fonda Contratto"
+        android:text="Found Contract"
         app:layout_constraintBottom_toTopOf="@+id/liquidateContractBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
@@ -102,7 +102,7 @@
         android:id="@+id/liquidateContractBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Liquida Contratto"
+        android:text="Liquidate Contract"
         app:layout_constraintBottom_toTopOf="@+id/progressBarDetail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"

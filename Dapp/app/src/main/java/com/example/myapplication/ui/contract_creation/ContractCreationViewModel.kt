@@ -61,7 +61,7 @@ class ContractCreationViewModel : ViewModel() {
 
                         Log.d("ContractCreationViewModel", "Last contract address: $contractAddress")
                     } else {
-                        Log.e("ContractCreationViewModel", "Transaction failed: $txHash")
+                        Log.e("ContractCreationViewModel", "Transaction failed with receipt: $receipt")
                     }
                 }
                 catch (e: Exception) {

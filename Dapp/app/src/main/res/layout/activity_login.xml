@@ -10,26 +10,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:text="Seleziona il tipo di utente"
+        android:text="Login selecting your user type"
         android:textSize="18sp" />
 
     <EditText
         android:id="@+id/addressEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Inserisci il tuo indirizzo"
+        android:hint="Insert your eth wallet address"
         android:inputType="text" />
 
     <Button
         android:id="@+id/btn_cliente"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cliente" />
+        android:text="Client" />
 
     <Button
         android:id="@+id/btn_assicuratore"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Assicuratore"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:text="Ensurer" />
 </LinearLayout>
