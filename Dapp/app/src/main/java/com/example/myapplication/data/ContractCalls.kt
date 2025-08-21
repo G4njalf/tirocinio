@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.util.Log
+import com.example.myapplication.BuildConfig
 import org.web3j.abi.datatypes.Bool
 import org.web3j.abi.datatypes.generated.Uint256
 import org.web3j.abi.datatypes.DynamicArray
@@ -29,8 +30,7 @@ import io.github.cdimascio.dotenv.dotenv
 
 class DynamicAddressArray(addresses: List<Address>) : DynamicArray<Address>(Address::class.java, addresses)
 
-val dotenv = dotenv()
-private val infuraurl = dotenv["INFURA_URL"]
+private val infuraurl = BuildConfig.INFURA_URL
 
 private val web3 = Web3j.build(HttpService(infuraurl))
 //HARDCODE DA TOGLIERE PRIMA O POI
@@ -40,8 +40,8 @@ private val tokenOwnerAddress = "0x8C6b618aC0b1E69FA7FF02Ec2a8EB6caDC29bc86"
 private val mytokenAddress = "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f"
 private val factoryAddressOLD = "0xAc12bd15e865e156bC712aeeaC6E6092b53BA6D3" // vecchio che va
 private val factoryAddress = "0xFAD9CF31f457b0880fA6E1C612F988ab69c53317"
-private val privateKeyAssicuratore = dotenv["PRIVATE_KEY_ASSICURATORE"]
-private val privateKeyAssicurato = dotenv["PRIVATE_KEY_ASSICURATO"]
+private val privateKeyAssicuratore = BuildConfig.PRIVATE_KEY_ASSICURATORE
+private val privateKeyAssicurato = BuildConfig.PRIVATE_KEY_ASSICURATO
 
 
 class BlockChainCalls{

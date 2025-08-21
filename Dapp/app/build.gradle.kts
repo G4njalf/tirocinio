@@ -1,11 +1,28 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
 }
 
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
+}
+
+val infuraUrl: String = localProperties.getProperty("INFURA_URL") ?: throw IllegalArgumentException("INFURA_URL property is required")
+val privatekeyEnsurer: String = localProperties.getProperty("PRIVATE_KEY_ASSICURATORE") ?: throw IllegalArgumentException("PRIVATE_KEY_ASSICURATORE property is required")
+val privatekeyEnsured: String = localProperties.getProperty("PRIVATE_KEY_ASSICURATO") ?: throw IllegalArgumentException("PRIVATE_KEY_ASSICURATO property is required")
+
 android {
     namespace = "com.example.myapplication"
     compileSdk = 35
+
+    buildFeatures{
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.example.myapplication"
@@ -15,6 +32,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "INFURA_URL", "\"$infuraUrl\"")
+        buildConfigField("String", "PRIVATE_KEY_ASSICURATORE", "\"$privatekeyEnsurer\"")
+        buildConfigField("String", "PRIVATE_KEY_ASSICURATO", "\"$privatekeyEnsured\"")
     }
 
     buildTypes {

@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Base -->
+    <color name="clr_dark_a0">#000000</color>
+    <color name="clr_light_a0">#FFFFFF</color>
+
+    <!-- Primary -->
+    <color name="clr_primary_a0">#96c47a</color>
+    <color name="clr_primary_a10">#94bc7b</color>
+    <color name="clr_primary_a20">#92b57c</color>
+    <color name="clr_primary_a30">#90ad7d</color>
+    <color name="clr_primary_a40">#8da57e</color>
+    <color name="clr_primary_a50">#8b9e7e</color>
+
+    <!-- Surface -->
+    <color name="clr_surface_a0">#FFFFFF</color>
+    <color name="clr_surface_a10">#F0F0F0</color>
+    <color name="clr_surface_a20">#E1E1E1</color>
+    <color name="clr_surface_a30">#D3D3D3</color>
+    <color name="clr_surface_a40">#C5C5C5</color>
+    <color name="clr_surface_a50">#B6B6B6</color>
+
+    <!-- Surface tonal -->
+    <color name="clr_surface_tonal_a0">#F5F9F1</color>
+    <color name="clr_surface_tonal_a10">#E7EBE4</color>
+    <color name="clr_surface_tonal_a20">#DADDD7</color>
+    <color name="clr_surface_tonal_a30">#CCCFCA</color>
+    <color name="clr_surface_tonal_a40">#BFC1BD</color>
+    <color name="clr_surface_tonal_a50">#B2B4B1</color>
 </resources>
