@@ -61,20 +61,20 @@ class HomeFragment : Fragment() {
             Log.d("HomeFragment", "Contract summary: $summaryText")
 
             val categoryColors = mapOf(
-                "Pending Contracts" to Color.parseColor("#FFA726"),    // arancione
-                "Funded Contracts" to Color.parseColor("#66BB6A"),     // verde
-                "Activated Contracts" to Color.parseColor("#29B6F6"),  // azzurro
-                "Liquidated Contracts" to Color.parseColor("#EF5350")  // rosso
+                "Pending" to Color.parseColor("#FFA726"),    // arancione
+                "Funded" to Color.parseColor("#66BB6A"),     // verde
+                "Activated" to Color.parseColor("#29B6F6"),  // azzurro
+                "Liquidated" to Color.parseColor("#EF5350")  // rosso
             )
 
             val entries = listOf(
-                PieEntry(pendingContracts.toFloat(), "Pending Contracts"),
-                PieEntry(fundedContracts.toFloat(), "Funded Contracts"),
-                PieEntry(activatedContracts.toFloat(), "Activated Contracts"),
-                PieEntry(liquidatedContracts.toFloat(), "Liquidated Contracts")
+                PieEntry(pendingContracts.toFloat(), "Pending"),
+                PieEntry(fundedContracts.toFloat(), "Funded"),
+                PieEntry(activatedContracts.toFloat(), "Activated"),
+                PieEntry(liquidatedContracts.toFloat(), "Liquidated")
             ).filter { it.value > 0 }
 
-            val dataSet = PieDataSet(entries, "Categorie")
+            val dataSet = PieDataSet(entries, "Contract Status")
 
             dataSet.colors = entries.map { categoryColors[it.label] ?: Color.GRAY }
 
@@ -88,21 +88,20 @@ class HomeFragment : Fragment() {
             pieChart.data = data
 
             pieChart.setUsePercentValues(true)
-            pieChart.description.isEnabled = false
+            pieChart.description.isEnabled = true
             pieChart.isDrawHoleEnabled = true
             pieChart.setHoleColor(Color.TRANSPARENT)
             pieChart.setTransparentCircleAlpha(0)
+            pieChart.setDrawEntryLabels(true)
+            pieChart.setEntryLabelColor(Color.WHITE)
+            pieChart.setEntryLabelTextSize(12f)
 
             pieChart.setEntryLabelColor(Color.WHITE)
             pieChart.setEntryLabelTextSize(12f)
 
-            pieChart.legend.isEnabled = true // se vuoi puoi metterlo a false
-            pieChart.legend.textColor = Color.WHITE
-            pieChart.legend.textSize = 14f
-            pieChart.legend.verticalAlignment = Legend.LegendVerticalAlignment.TOP
-            pieChart.legend.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-            pieChart.legend.orientation = Legend.LegendOrientation.VERTICAL
-            //pieChart.legend.setDrawInside(false)
+            pieChart.legend.isEnabled = false
+
+
 // 🔥 Animazione
             pieChart.animateY(1400, Easing.EaseInOutQuad)
 

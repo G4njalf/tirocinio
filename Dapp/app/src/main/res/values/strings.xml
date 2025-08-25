@@ -11,4 +11,5 @@
     <string name="menu_contracts">Contracts</string>
     <string name="menu_contract_creation">Contract Creation</string>
     <string name="menu_logout">Logout</string>
+    <string name="graph_title">Contract Details Graph</string>
 </resources>
