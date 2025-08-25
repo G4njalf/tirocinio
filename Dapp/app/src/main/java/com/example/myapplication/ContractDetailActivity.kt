@@ -72,7 +72,7 @@ class ContractDetailActivity : AppCompatActivity() {
         binding.isLiquidatoTextView.text = if (isLiquidato) "Liquidated" else "Not Liquidated"
         binding.isAttivatoTextView.text = if (isAttivato) "Activated" else "Not Activated"
         binding.isFundendTextView.text = if (isFundend) "Funded" else "Not Funded"
-        binding.addressAssicuratoTextView.text = "Ensured Address : ${addressAssicurato}" ?: "Ensured Address not available"
+        binding.addressAssicuratoTextView.text = "Client Address : ${addressAssicurato}" ?: "Ensured Address not available"
         binding.addressAssicuratoreTextView.text = "Ensurer Address : ${addressAssicuratore}" ?: "Ensurer Address not available"
 
 

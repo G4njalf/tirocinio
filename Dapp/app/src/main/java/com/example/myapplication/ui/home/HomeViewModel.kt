@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import com.example.myapplication.data.BlockChainCalls
+import com.example.myapplication.ui.contracts.Contract
 import java.math.BigInteger
 
 
@@ -18,7 +19,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
 
     private val editor = application.getSharedPreferences("UserPrefs", MODE_PRIVATE)
     private val userRole = editor.getString("user_role", null)
-    private val userAddress = editor.getString("user_address", null)
+    private val userAddress = editor.getString("user_address", null) ?: ""
 
     private val _text2 = MutableLiveData<String>().apply {
         value = userRole
@@ -28,6 +29,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
 
     private val contractCalls = ContractCalls()
     private val blockChainCalls = BlockChainCalls()
+
+    private val _contracts = MutableLiveData<List<Contract>>()
+    val contracts: LiveData<List<Contract>> get() = _contracts
+
+    private val contractRepository = ContractRepository()
+
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
 
 
     fun getDataFromSepolia(){
@@ -59,6 +68,66 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "Error minting tokens", e)
             }
+        }
+    }
+
+    fun loadContracts(){
+        _isLoading.value  = true
+        if (contractRepository.contractData.value?.isNotEmpty() == true && false) {
+            // If contracts are already loaded, no need to fetch again
+            // secondo me non serve perche e meglio controllare sempre se ci sono nuovi contratti
+            _contracts.value = contractRepository.contractData.value
+            Log.d("ContractsViewModel", "Contracts already loaded, skipping fetch")
+            _isLoading.value = false
+            return
+        }
+        viewModelScope.launch {
+            try {
+                val contractAddresses: List<String> = when (userRole) {
+                    "cliente" -> contractCalls.getInsuranceContractsByInsured(userAddress)
+                    "assicuratore" -> contractCalls.getAllInsuranceContracts()
+                    else -> emptyList()
+                }
+                val contractList = mutableListOf<Contract>()
+                for (address in contractAddresses){
+                    val data = contractCalls.getContractVariables(address)
+                    Log.d("data", "Contract data for $address: $data")
+                    if (data["assicurato"].toString() != userAddress.lowercase() && (userRole == "cliente")){ // normalizzo userAddress perche me li da tutto minuscolo dall bc
+                        Log.wtf("loadContracts", "Contract $address is not associated with the user address $userAddress")
+                    }
+                    val version = data["version"]?.toString() ?: "unknown"
+                    if (version != "0.1" && false) { // bypasso il controllo della versione per ora
+                        Log.i("loadContracts", "Contract $address is not version 0.1, skipping")
+                        continue // skip contracts that are not version 1.0
+                    }
+                    contractRepository.addContract(
+                        address,
+                        (data["premio"] as BigInteger).toInt().toUInt(),
+                        data["liquidato"] as Boolean,
+                        data["attivato"] as Boolean,
+                        data["funded"] as Boolean,
+                        data["assicurato"] as String,
+                        data["assicuratore"] as String
+                    )
+                    contractList.add(
+                        Contract(
+                            address,
+                            (data["premio"] as BigInteger).toInt().toUInt(),
+                            data["liquidato"] as Boolean,
+                            data["attivato"] as Boolean,
+                            data["funded"] as Boolean,
+                            data["assicurato"] as String,
+                            data["assicuratore"] as String
+                        )
+                    )
+                }
+                _contracts.postValue(contractList) // prendo i dati dalla copia locale per evitare che la repo non sia ancora aggioranta
+            }
+            catch (e: Exception) {
+                Log.e("ContractsViewModel", "Error loading contract addresses", e)
+                _contracts.postValue(emptyList())
+            }
+            _isLoading.value = false
         }
     }
 

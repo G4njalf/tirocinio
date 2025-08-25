@@ -6,6 +6,7 @@ import com.example.myapplication.ui.contracts.Contract
 
 
 // REPOSITORY PER MANTENERE IN MEMORIA I CONTRATTI DURANTE LA SESSIONE
+// non so se ha senso in quanto i dati vengono presi dalla blockchain
 
 class ContractRepository {
 
@@ -31,5 +32,9 @@ class ContractRepository {
     fun addContractAddress(address: String) {
         val currentAddresses = _contractAddresses.value ?: emptyList()
         _contractAddresses.value = currentAddresses + address
+    }
+
+    fun getContracts(): List<Contract> {
+        return _contractData.value ?: emptyList()
     }
 }

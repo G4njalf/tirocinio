@@ -15,6 +15,7 @@ import com.example.myapplication.databinding.ActivityMainBinding
 import android.util.Log
 import android.view.MenuItem
 import android.content.Intent
+import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,7 +35,10 @@ class MainActivity : AppCompatActivity() {
             // Carica il layout per il cliente
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
-
+            val roleTextView = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.roleTextView)
+            roleTextView.text = "Hello, Client"
+            val addressTextViewNav = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.addressTextViewNav)
+            addressTextViewNav.text = sharedPreferences.getString("user_address", "Indirizzo non disponibile")
             setSupportActionBar(binding.appBarMain.toolbar)
 
             binding.appBarMain.fab.setOnClickListener { view ->
@@ -42,10 +46,17 @@ class MainActivity : AppCompatActivity() {
                     .setAction("Action", null)
                     .setAnchorView(R.id.fab).show()
             }
+
+
+
         } else if (userRole == "assicuratore") {
             // Carica il layout per l'assicuratore
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
+            val roleTextView = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.roleTextView)
+            roleTextView.text = "Hello, Ensurer"
+            val addressTextViewNav = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.addressTextViewNav)
+            addressTextViewNav.text = sharedPreferences.getString("user_address", "Indirizzo non disponibile")
 
             setSupportActionBar(binding.appBarMain.toolbar)
 

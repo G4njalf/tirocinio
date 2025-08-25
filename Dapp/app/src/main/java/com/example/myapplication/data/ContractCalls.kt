@@ -26,7 +26,7 @@ import org.web3j.utils.Numeric
 import java.math.BigInteger
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 import kotlinx.coroutines.delay
-import io.github.cdimascio.dotenv.dotenv
+
 
 class DynamicAddressArray(addresses: List<Address>) : DynamicArray<Address>(Address::class.java, addresses)
 
@@ -208,7 +208,7 @@ class ContractCalls {
 
         val basegasPrice = web3.ethGasPrice().send().gasPrice
         val gasPrice = basegasPrice.multiply(BigInteger.valueOf(120)).divide(BigInteger.valueOf(100)) // 20% more than the base gas price
-        val gasLimit = BigInteger.valueOf(1_500_000L) // per ora cosi
+        val gasLimit = BigInteger.valueOf(10_500_000L) // per ora cosi
 
         val function = Function(
             "createInsurance",

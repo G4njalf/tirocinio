@@ -33,6 +33,8 @@ class ContractsViewModel (application: Application) : AndroidViewModel(applicati
     val isLoading: LiveData<Boolean> get() = _isLoading
 
 
+
+
     fun loadContracts(){
         _isLoading.value  = true
         if (contractRepository.contractData.value?.isNotEmpty() == true && false) {

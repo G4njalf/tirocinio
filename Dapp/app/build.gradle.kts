@@ -86,6 +86,6 @@ dependencies {
     implementation(platform("com.reown:android-bom:1.4.5"))
     implementation("com.reown:android-core")
     implementation("com.reown:appkit")
-    implementation ("io.github.cdimascio:dotenv-kotlin:6.4.1")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
 }

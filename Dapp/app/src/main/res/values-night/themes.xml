@@ -3,10 +3,11 @@
     <style name="Theme.MyApplication" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Colori principali -->
         <item name="colorPrimary">@color/clr_primary_a0</item>
-        <item name="colorPrimaryVariant">@color/clr_primary_a20</item>
-        <item name="colorOnPrimary">@color/clr_dark_a0</item>
+        <item name="colorPrimaryVariant">@color/clr_primary_a10</item>
+        <item name="colorOnPrimary">@color/clr_light_a0</item>
 
-        <item name="colorSecondary">@color/clr_primary_a30</item>
+        <item name="colorSecondary">@color/clr_primary_a20</item>
+        <item name="colorSecondaryVariant">@color/clr_primary_a30</item>
         <item name="colorOnSecondary">@color/clr_light_a0</item>
 
         <!-- Background e superfici -->

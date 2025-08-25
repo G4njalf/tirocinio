@@ -61,7 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="31dp"
-        android:text="Ensured:"
+        android:text="Client:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/isFundendTextView" />
 
