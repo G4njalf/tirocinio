@@ -21,8 +21,20 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
     private val userRole = editor.getString("user_role", null)
     private val userAddress = editor.getString("user_address", null) ?: ""
 
-    private val _text2 = MutableLiveData<String>().apply {
+    private val _totalLiquidated = MutableLiveData<Int>().apply {
+        value = 0
+    }
+
+    val totalLiquidated: LiveData<Int> = _totalLiquidated
+
+    private val _userRoleText = MutableLiveData<String>().apply {
         value = userRole
+    }
+
+    val userRoleText: LiveData<String> = _userRoleText
+
+    private val _text2 = MutableLiveData<String>().apply {
+        value = "Token Balance: fetching..."
     }
 
     val text2: LiveData<String> = _text2
@@ -44,7 +56,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
         viewModelScope.launch {
             try {
                 val balance = contractCalls.getTokenBalance(userAddress?: "")
-                _text2.value = "Balance: $balance"
+                _text2.value = "Token Balance: $balance MTK"
             }
             catch (e: Exception) {
                 Log.e("HomeViewModel", "Error fetching token balance", e)
@@ -72,6 +84,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
     }
 
     fun loadContracts(){
+        _totalLiquidated.value = 0
         _isLoading.value  = true
         if (contractRepository.contractData.value?.isNotEmpty() == true && false) {
             // If contracts are already loaded, no need to fetch again
@@ -99,6 +112,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
                     if (version != "0.1" && false) { // bypasso il controllo della versione per ora
                         Log.i("loadContracts", "Contract $address is not version 0.1, skipping")
                         continue // skip contracts that are not version 1.0
+                    }
+                    // mi salvo la somma dei premi dei contratti liquidati
+                    if(data["liquidato"] as Boolean){
+                        val premio = (data["premio"] as BigInteger).toInt()
+                        _totalLiquidated.value = (_totalLiquidated.value ?: 0) + premio
                     }
                     contractRepository.addContract(
                         address,

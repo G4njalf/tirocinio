@@ -41,11 +41,13 @@ class MainActivity : AppCompatActivity() {
             addressTextViewNav.text = sharedPreferences.getString("user_address", "Indirizzo non disponibile")
             setSupportActionBar(binding.appBarMain.toolbar)
 
+            /*
+            vecchia azione del fab (il pulsante in basso a destra)
             binding.appBarMain.fab.setOnClickListener { view ->
                 Snackbar.make(view, "Azione per il cliente", Snackbar.LENGTH_LONG)
                     .setAction("Action", null)
                     .setAnchorView(R.id.fab).show()
-            }
+            }*/
 
 
 
@@ -60,11 +62,11 @@ class MainActivity : AppCompatActivity() {
 
             setSupportActionBar(binding.appBarMain.toolbar)
 
-            binding.appBarMain.fab.setOnClickListener { view ->
+            /*binding.appBarMain.fab.setOnClickListener { view ->
                 Snackbar.make(view, "Azione per l'assicuratore", Snackbar.LENGTH_LONG)
                     .setAction("Action", null)
                     .setAnchorView(R.id.fab).show()
-            }
+            }*/
         }
 
         // Configura il Navigation Drawer

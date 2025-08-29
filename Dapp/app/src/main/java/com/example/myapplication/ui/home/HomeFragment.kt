@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.home
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -7,17 +8,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.databinding.FragmentHomeBinding
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
-import com.github.mikephil.charting.utils.ColorTemplate
 
 class HomeFragment : Fragment() {
 
@@ -38,12 +38,25 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView2: TextView = binding.textsepolia
+        homeViewModel.getDataFromSepolia()
+        val textView2: TextView = binding.tokenBalanceTextView
         homeViewModel.text2.observe(viewLifecycleOwner) {
             textView2.text = it
         }
 
+        binding.numberNotPendingContractTextView.text = ""
+
         homeViewModel.loadContracts()
+        val totalLiquidatedTextView: TextView = binding.totalMoneyLiquidatedTextView
+        homeViewModel.totalLiquidated.observe(viewLifecycleOwner){
+            if(homeViewModel.userRoleText.value == "cliente"){
+                totalLiquidatedTextView.text = "You have received $it MTK from liquidated contracts"
+            }
+            else{
+                totalLiquidatedTextView.text = "You have liquidated contracts worth $it MTK"
+            }
+
+        }
 
         val pieChart: PieChart = binding.piechart
         pieChart.setNoDataText("Fetching data...")
@@ -51,13 +64,20 @@ class HomeFragment : Fragment() {
 
         homeViewModel.contracts.observe(viewLifecycleOwner) { contratti ->
             val totalContracts = contratti.size
-            val pendingContracts = contratti.count { !it.isFundend && !it.isAttivato && !it.isLiquidato }
-            val fundedContracts = contratti.count { it.isFundend && !it.isLiquidato && !it.isAttivato }
+            val pendingContracts =
+                contratti.count { !it.isFundend && !it.isAttivato && !it.isLiquidato }
+            val fundedContracts =
+                contratti.count { it.isFundend && !it.isLiquidato && !it.isAttivato }
             val activatedContracts = contratti.count { it.isAttivato && !it.isLiquidato }
             val liquidatedContracts = contratti.count { it.isLiquidato }
 
+            val notPendingContracts = totalContracts - pendingContracts
 
-            val summaryText = "Total: $totalContracts\nActivated: $activatedContracts\nFunded: $fundedContracts\nLiquidated: $liquidatedContracts \nPending: $pendingContracts"
+            binding.numberNotPendingContractTextView.text =
+                "You have $notPendingContracts active contracts"
+
+            val summaryText =
+                "Total: $totalContracts\nActivated: $activatedContracts\nFunded: $fundedContracts\nLiquidated: $liquidatedContracts \nPending: $pendingContracts"
             Log.d("HomeFragment", "Contract summary: $summaryText")
 
             val categoryColors = mapOf(
@@ -74,7 +94,7 @@ class HomeFragment : Fragment() {
                 PieEntry(liquidatedContracts.toFloat(), "Liquidated")
             ).filter { it.value > 0 }
 
-            val dataSet = PieDataSet(entries, "Contract Status")
+            val dataSet = PieDataSet(entries, "")
 
             dataSet.colors = entries.map { categoryColors[it.label] ?: Color.GRAY }
 
@@ -88,7 +108,7 @@ class HomeFragment : Fragment() {
             pieChart.data = data
 
             pieChart.setUsePercentValues(true)
-            pieChart.description.isEnabled = true
+            pieChart.description.isEnabled = false
             pieChart.isDrawHoleEnabled = true
             pieChart.setHoleColor(Color.TRANSPARENT)
             pieChart.setTransparentCircleAlpha(0)
@@ -109,13 +129,7 @@ class HomeFragment : Fragment() {
             pieChart.invalidate()
         }
 
-        binding.button1.setOnClickListener {
-            homeViewModel.getDataFromSepolia()
-        }
 
-        /*binding.buttonMintTkn.setOnClickListener {
-            homeViewModel.mintTokens()
-        }*/
 
         return root
     }
