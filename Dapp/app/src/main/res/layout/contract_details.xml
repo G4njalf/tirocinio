@@ -99,6 +99,15 @@
             android:text="Ensurer:"
             android:textSize="16sp"/>
 
+        <TextView
+            android:id="@+id/requestIdTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="Request Id:"
+            android:textSize="16sp"/>
+
     </LinearLayout>
 
     <!-- Pulsanti -->

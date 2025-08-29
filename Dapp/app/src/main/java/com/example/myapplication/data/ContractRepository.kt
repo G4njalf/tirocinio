@@ -23,10 +23,11 @@ class ContractRepository {
                     isAttivato: Boolean,
                     isFundend: Boolean,
                     addressAssicurato: String,
-                    addressAssicuratore: String) {
+                    addressAssicuratore: String,
+                    requestId: String) {
         val currentContracts = _contractData.value ?: emptyList()
         _contractData.value = currentContracts + Contract(address, premio,
-            isLiquidato, isAttivato, isFundend, addressAssicurato, addressAssicuratore)
+            isLiquidato, isAttivato, isFundend, addressAssicurato, addressAssicuratore,requestId)
     }
 
     fun addContractAddress(address: String) {

@@ -16,7 +16,9 @@ data class Contract(
     val isAttivato: Boolean,
     val isFundend: Boolean,
     val addressAssicurato: String,
-    val addressAssicuratore: String)
+    val addressAssicuratore: String,
+    val requestId: String
+)
 
 class ContractAdapter(private val contractList: List<Contract>):RecyclerView.Adapter<ContractAdapter.ContractViewHolder>() {
 
@@ -46,6 +48,7 @@ class ContractAdapter(private val contractList: List<Contract>):RecyclerView.Ada
                 putExtra("contractIsFundend", contract.isFundend)
                 putExtra("contractAddressAssicurato", contract.addressAssicurato)
                 putExtra("contractAddressAssicuratore", contract.addressAssicuratore)
+                putExtra("contractRequestId", contract.requestId)
             }
             context.startActivity(intent)
         }

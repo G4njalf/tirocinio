@@ -71,7 +71,8 @@ class ContractsViewModel (application: Application) : AndroidViewModel(applicati
                         data["attivato"] as Boolean,
                         data["funded"] as Boolean,
                         data["assicurato"] as String,
-                        data["assicuratore"] as String
+                        data["assicuratore"] as String,
+                        data["requestId"] as String
                     )
                     contractList.add(
                         Contract(
@@ -81,7 +82,8 @@ class ContractsViewModel (application: Application) : AndroidViewModel(applicati
                             data["attivato"] as Boolean,
                             data["funded"] as Boolean,
                             data["assicurato"] as String,
-                            data["assicuratore"] as String
+                            data["assicuratore"] as String,
+                            data["requestId"] as String
                         )
                     )
                 }

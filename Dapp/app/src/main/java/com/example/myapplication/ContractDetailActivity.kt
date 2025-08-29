@@ -63,18 +63,19 @@ class ContractDetailActivity : AppCompatActivity() {
         val isFundend = intent.getBooleanExtra("contractIsFundend", false)
         val addressAssicurato = intent.getStringExtra("contractAddressAssicurato")
         val addressAssicuratore = intent.getStringExtra("contractAddressAssicuratore")
+        val requestId = intent.getStringExtra("contractRequestId")
 
         Log.i("ContractDetailActivity", "Title: $title, Address: $address")
 
         // Imposta i dati nelle TextView
-        binding.addressTextView.text = "Contract Address : ${address}" ?: "Address not available"
-        binding.premioTextView.text = "Premium : ${premio}" ?: "Premium not available"
+        binding.addressTextView.text = "Contract Address : $address" ?: "Address not available"
+        binding.premioTextView.text = "Premium : $premio" ?: "Premium not available"
         binding.isLiquidatoTextView.text = if (isLiquidato) "Liquidated" else "Not Liquidated"
         binding.isAttivatoTextView.text = if (isAttivato) "Activated" else "Not Activated"
         binding.isFundendTextView.text = if (isFundend) "Funded" else "Not Funded"
-        binding.addressAssicuratoTextView.text = "Client Address : ${addressAssicurato}" ?: "Ensured Address not available"
-        binding.addressAssicuratoreTextView.text = "Ensurer Address : ${addressAssicuratore}" ?: "Ensurer Address not available"
-
+        binding.addressAssicuratoTextView.text = "Client Address : $addressAssicurato" ?: "Ensured Address not available"
+        binding.addressAssicuratoreTextView.text = "Ensurer Address : $addressAssicuratore" ?: "Ensurer Address not available"
+        binding.requestIdTextView.text = "Request ID : $requestId" ?: "Request ID not available"
 
 
         if (userRole == "cliente") {
