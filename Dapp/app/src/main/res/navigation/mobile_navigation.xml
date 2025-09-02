@@ -15,11 +15,54 @@
         android:id="@+id/nav_gallery"
         android:name="com.example.myapplication.ui.contracts.ContractsFragment"
         android:label="@string/menu_contracts"
-        tools:layout="@layout/fragment_contracts" />
+        tools:layout="@layout/fragment_contracts">
+        <action
+            android:id="@+id/actionContractsFragmentToContractDetailFragment"
+            app:destination="@id/nav_contract_detail" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_contract_creation"
         android:name="com.example.myapplication.ui.contract_creation.ContractCreationFragment"
         android:label="@string/menu_contract_creation"
         tools:layout="@layout/fragment_contract_creation" />
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.example.myapplication.ui.settings.SettingsFragment"
+        android:label="@string/menu_settings"
+        tools:layout="@layout/fragment_settings" />
+
+
+    <fragment
+        android:id="@+id/nav_contract_detail"
+        android:name="com.example.myapplication.ui.contract_detail.ContractDetailFragment"
+        android:label="@string/menu_contract_detail"
+        tools:layout="@layout/fragment_contract_details" >
+        <argument
+            android:name="contractAddress"
+            app:argType="string" />
+        <argument
+            android:name="contractPremio"
+            app:argType="string" />
+        <argument
+            android:name="contractIsLiquidato"
+            app:argType="boolean" />
+        <argument
+            android:name="contractIsAttivato"
+            app:argType="boolean" />
+        <argument
+            android:name="contractIsFundend"
+            app:argType="boolean" />
+        <argument
+            android:name="contractAddressAssicurato"
+            app:argType="string" />
+        <argument
+            android:name="contractAddressAssicuratore"
+            app:argType="string" />
+        <argument
+            android:name="contractRequestId"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

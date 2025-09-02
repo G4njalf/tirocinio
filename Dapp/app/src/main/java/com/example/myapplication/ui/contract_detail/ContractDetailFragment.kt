@@ -1,53 +1,49 @@
-/*package com.example.myapplication
+package com.example.myapplication.ui.contract_detail
 
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.myapplication.databinding.ContractDetailsBinding
-import com.example.myapplication.data.ContractCalls
 import com.example.myapplication.data.BlockChainCalls
+import com.example.myapplication.data.ContractCalls
+import com.example.myapplication.databinding.FragmentContractDetailsBinding
+import com.example.myapplication.databinding.FragmentHomeBinding
+import com.example.myapplication.ui.contract_detail.ContractDetailViewModel
 import kotlinx.coroutines.launch
-import org.web3j.protocol.core.methods.response.TransactionReceipt
 import java.math.BigInteger
 
-class ContractDetailActivity : AppCompatActivity() {
+class ContractDetailFragment : Fragment() {
 
-    private lateinit var binding: ContractDetailsBinding
+    private var _binding: FragmentContractDetailsBinding? = null
 
-    private fun fetchContractDetails(contractAddress: String) {
-        val contractCalls = ContractCalls()
-        lifecycleScope.launch {
-            try {
-                val data = contractCalls.getContractVariables(contractAddress)
-                val ass = data["premio"]
-                Log.d("DetailActivity", "Fetched contract data: $ass")
-                // Aggiorna la UI con i dati freschi
-                binding.isLiquidatoTextView.text = if (data["liquidato"] as Boolean) "Liquidato" else "Non Liquidato"
-                binding.isAttivatoTextView.text = if (data["attivato"] as Boolean) "Attivato" else "Non Attivato"
-                binding.isFundendTextView.text = if (data["funded"] as Boolean) "Fondato" else "Non Fondato"
-            } catch (e: Exception) {
-                Log.e("ContractDetailActivity", "Errore durante il fetch dei dettagli aggiornati", e)
-            }
-        }
-    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+
+    private val binding get() = _binding!!
+
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?,
+                              savedInstanceState: Bundle?) : View {
+
+        val args = ContractDetailFragmentArgs.fromBundle(requireArguments())
+
+        val contractDetailViewModel =
+            ViewModelProvider(this).get(ContractDetailViewModel::class.java)
+
+        _binding = FragmentContractDetailsBinding.inflate(inflater, container, false)
+        val root: View = binding.root
+
         Log.i("ContractDetailActivity", "onCreate called")
-        super.onCreate(savedInstanceState)
-
-        // Inizializza il View Binding
-        binding = ContractDetailsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         val contractCalls = ContractCalls()
         val blockChainCalls = BlockChainCalls()
 
-        val editor = application.getSharedPreferences("UserPrefs", MODE_PRIVATE)
-        val userRole = editor.getString("user_role", null)
-        val userAddress = editor.getString("user_address", null)
+
 
         val activateBtn = binding.activateContractbtn
         val liquidateBtn = binding.liquidateContractBtn
@@ -55,17 +51,17 @@ class ContractDetailActivity : AppCompatActivity() {
         val progression = binding.progressBarDetail
         progression.visibility= View.GONE
 
-        // Recupera i dati dall'Intent
-        val address = intent.getStringExtra("contractAddress")
-        val premio = intent.getStringExtra("contractPremio")
-        val isLiquidato = intent.getBooleanExtra("contractIsLiquidato", false)
-        val isAttivato = intent.getBooleanExtra("contractIsAttivato", false)
-        val isFundend = intent.getBooleanExtra("contractIsFundend", false)
-        val addressAssicurato = intent.getStringExtra("contractAddressAssicurato")
-        val addressAssicuratore = intent.getStringExtra("contractAddressAssicuratore")
-        val requestId = intent.getStringExtra("contractRequestId")
+        // Recupera i dati con safe args
+        val address = args.contractAddress
+        val premio = args.contractPremio
+        val isLiquidato = args.contractIsLiquidato
+        val isAttivato = args.contractIsAttivato
+        val isFundend = args.contractIsFundend
+        val addressAssicurato = args.contractAddressAssicurato
+        val addressAssicuratore = args.contractAddressAssicuratore
+        val requestId = args.contractRequestId
 
-        Log.i("ContractDetailActivity", "Title: $title, Address: $address")
+        Log.i("ContractDetailActivity", "Address: $address")
 
         // Imposta i dati nelle TextView
         binding.addressTextView.text = "Contract Address : $address" ?: "Address not available"
@@ -78,12 +74,12 @@ class ContractDetailActivity : AppCompatActivity() {
         binding.requestIdTextView.text = "Request ID : $requestId" ?: "Request ID not available"
 
 
-        if (userRole == "cliente") {
+        if (contractDetailViewModel.userRole == "cliente") {
             activateBtn.visibility = if (!isAttivato and isFundend) View.VISIBLE else View.GONE
             liquidateBtn.visibility = if(!isLiquidato and isAttivato and isFundend) View.VISIBLE else View.GONE
             fundBtn.visibility = View.GONE
         }
-        else if (userRole == "assicuratore") {
+        else if (contractDetailViewModel.userRole == "assicuratore") {
             activateBtn.visibility = View.GONE
             liquidateBtn.visibility = View.GONE
             fundBtn.visibility = if (!isFundend) View.VISIBLE else View.GONE
@@ -112,7 +108,7 @@ class ContractDetailActivity : AppCompatActivity() {
                         addressAssicuratosafe,
                         addressContractSafe,
                         premiotoBigInteger,
-                        userRole ?: "",
+                        contractDetailViewModel.userRole ?: "",
                         "0x8821aFDa84d71988cf0b570C535FC502720B33DD" // zonia token address
                     )
                     val recipt = blockChainCalls.waitForReceipt(approvehash)
@@ -134,7 +130,7 @@ class ContractDetailActivity : AppCompatActivity() {
                         Log.d("ContractDetailActivity", "Zonia request successful")
 
                         val requestId = contractCalls.getContractVariables(addressContractSafe)["requestId"] as? String
-                        Toast.makeText(this@ContractDetailActivity, "Zonia request successful with ID: $requestId", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), "Zonia request successful with ID: $requestId", Toast.LENGTH_LONG).show()
                     }
                     else {
                         Log.e("ContractDetailActivity", "Zonia request failed")
@@ -148,7 +144,7 @@ class ContractDetailActivity : AppCompatActivity() {
                     return@launch
                 }
                 try {
-                    Toast.makeText(this@ContractDetailActivity, "Contract Eligible for liquidation", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), "Contract Eligible for liquidation", Toast.LENGTH_LONG).show()
                     val liquidatehash =
                         contractCalls.liquidateContract(addressContractSafe, addressAssicuratosafe)
                     val recipt = blockChainCalls.waitForReceipt(liquidatehash)
@@ -165,7 +161,16 @@ class ContractDetailActivity : AppCompatActivity() {
                     progression.visibility = View.GONE
                     return@launch
                 }
-                fetchContractDetails(addressContractSafe)
+                contractDetailViewModel.fetchContractDetails(addressContractSafe)
+                contractDetailViewModel.isLiquidato.observe(viewLifecycleOwner){ value ->
+                    binding.isLiquidatoTextView.text = if (value) "Liquidated" else "Not Liquidated"
+                }
+                contractDetailViewModel.isAttivato.observe(viewLifecycleOwner){ value ->
+                    binding.isAttivatoTextView.text = if (value) "Activated" else "Not Activated"
+                }
+                contractDetailViewModel.isFunded.observe(viewLifecycleOwner){ value ->
+                    binding.isFundendTextView.text = if (value) "Funded" else "Not Funded"
+                }
                 progression.visibility = View.GONE
             }
         }
@@ -179,7 +184,12 @@ class ContractDetailActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 progression.visibility = View.VISIBLE
                 try{
-                    val approvehash = blockChainCalls.approveTokenTransfer(addressAssicuratosafe,addressContractSafe,activateamountsafe,userRole?:"","0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f")
+                    val approvehash = blockChainCalls.approveTokenTransfer(
+                        addressAssicuratosafe,
+                        addressContractSafe,
+                        activateamountsafe,
+                        contractDetailViewModel.userRole?:"",
+                        "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f")
                     val recipt = blockChainCalls.waitForReceipt(approvehash)
                     if (recipt.status == "0x1") {
                         Log.d("ContractDetailActivity", "Token transfer approved successfully")
@@ -208,7 +218,7 @@ class ContractDetailActivity : AppCompatActivity() {
                     Log.e("ContractDetailActivity", "Error during activation process", e)
                     progression.visibility = View.GONE
                 }
-                fetchContractDetails(addressContractSafe)
+                contractDetailViewModel.fetchContractDetails(addressContractSafe)
                 progression.visibility = View.GONE
             }
         }
@@ -233,7 +243,7 @@ class ContractDetailActivity : AppCompatActivity() {
                         addressAssicuratoresafe,
                         addressContractSafe,
                         premiotoBigInteger,
-                        userRole ?: "",
+                        contractDetailViewModel.userRole ?: "",
                         "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f"
                     )
                     val recipt = blockChainCalls.waitForReceipt(approvehash)
@@ -262,11 +272,16 @@ class ContractDetailActivity : AppCompatActivity() {
                     Log.e("ContractDetailActivity", "Error during funding process", e)
                     progression.visibility = View.GONE
                 }
-                fetchContractDetails(addressContractSafe)
+                contractDetailViewModel.fetchContractDetails(addressContractSafe)
                 progression.visibility = View.GONE
             }
         }
+        return root
     }
-}
 
-*/
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+}

@@ -5,9 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myapplication.ContractDetailActivity
 import com.example.myapplication.R
+import com.example.myapplication.ui.contracts.ContractsFragmentDirections
 
 data class Contract(
     val address: String,
@@ -20,7 +21,7 @@ data class Contract(
     val requestId: String
 )
 
-class ContractAdapter(private val contractList: List<Contract>):RecyclerView.Adapter<ContractAdapter.ContractViewHolder>() {
+class ContractAdapter(private val contractList: List<Contract>,private val navController: NavController):RecyclerView.Adapter<ContractAdapter.ContractViewHolder>() {
 
     class ContractViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val premioText: TextView = itemView.findViewById(R.id.premioText)
@@ -39,18 +40,18 @@ class ContractAdapter(private val contractList: List<Contract>):RecyclerView.Ada
         holder.premioText.text = "value : ${contract.premio}"
 
         holder.itemView.setOnClickListener {
-            val context = holder.itemView.context
-            val intent = Intent(context,ContractDetailActivity::class.java).apply {
-                putExtra("contractAddress", contract.address)
-                putExtra("contractPremio", contract.premio.toString())
-                putExtra("contractIsLiquidato", contract.isLiquidato)
-                putExtra("contractIsAttivato", contract.isAttivato)
-                putExtra("contractIsFundend", contract.isFundend)
-                putExtra("contractAddressAssicurato", contract.addressAssicurato)
-                putExtra("contractAddressAssicuratore", contract.addressAssicuratore)
-                putExtra("contractRequestId", contract.requestId)
-            }
-            context.startActivity(intent)
+            val contract = contractList[position]
+            val action = ContractsFragmentDirections.actionContractsFragmentToContractDetailFragment(
+                contract.address,
+                contract.premio.toString(),
+                contract.isLiquidato,
+                contract.isAttivato,
+                contract.isFundend,
+                contract.addressAssicurato,
+                contract.addressAssicuratore,
+                contract.requestId
+            )
+            navController.navigate(action)
         }
 
     }

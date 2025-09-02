@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.FragmentContractsBinding
 
@@ -39,14 +40,14 @@ class ContractsFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        val emptyAdapter = ContractAdapter(emptyList())
+        val emptyAdapter = ContractAdapter(emptyList(), findNavController())
         recyclerView.adapter = emptyAdapter
 
         contractViewModel.loadContracts()
         Log.d("ContractsFragment", "aaa")
         contractViewModel.contracts.observe(viewLifecycleOwner) { contratti ->
             Log.d("ContractsFragment", "ContractsFragment: Loaded contracts: $contratti")
-            val adapter = ContractAdapter(contratti)
+            val adapter = ContractAdapter(contratti, findNavController())
             recyclerView.adapter = adapter
         }
 
