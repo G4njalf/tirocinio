@@ -17,6 +17,8 @@ workflow remix :
 
 const tokenAddress = "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f";
 const factoryAddress = "0xFAD9CF31f457b0880fA6E1C612F988ab69c53317";
+const zoniaTokenAddress = "0x8821aFDa84d71988cf0b570C535FC502720B33DD";
+const gateAddress = "0xbb6849DC5D97Bd55DE9A23B58CD5bBF3Bfdda0FA";
 const path = require("path");
 const Web3 = require("web3").Web3;
 const web3 = new Web3(
