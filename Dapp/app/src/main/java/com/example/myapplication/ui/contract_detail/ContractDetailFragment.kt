@@ -103,6 +103,7 @@ class ContractDetailFragment : Fragment() {
             }
             lifecycleScope.launch {
                 progression.visibility = View.VISIBLE
+                progression.progress = 10
                 try {
                     val approvehash = blockChainCalls.approveTokenTransfer(
                         addressAssicuratosafe,
@@ -111,6 +112,7 @@ class ContractDetailFragment : Fragment() {
                         contractDetailViewModel.userRole ?: "",
                         "0x8821aFDa84d71988cf0b570C535FC502720B33DD" // zonia token address
                     )
+                    progression.progress = 25
                     val recipt = blockChainCalls.waitForReceipt(approvehash)
                     if (recipt.status == "0x1") {
                         Log.d("ContractDetailActivity", "ZONIA Token transfer approved successfully")
@@ -137,6 +139,7 @@ class ContractDetailFragment : Fragment() {
                         progression.visibility = View.GONE
                         return@launch
                     }
+                    progression.progress = 50
                 }
                 catch (e: Exception) {
                     Log.e("ContractDetailActivity", "Error during zonia request process", e)
@@ -156,6 +159,7 @@ class ContractDetailFragment : Fragment() {
                         progression.visibility = View.GONE
                         return@launch
                     }
+                    progression.progress = 75
                 } catch (e: Exception) {
                     Log.e("ContractDetailActivity", "Error during liquidation process", e)
                     progression.visibility = View.GONE
@@ -171,6 +175,7 @@ class ContractDetailFragment : Fragment() {
                 contractDetailViewModel.isFunded.observe(viewLifecycleOwner){ value ->
                     binding.isFundendTextView.text = if (value) "Funded" else "Not Funded"
                 }
+                progression.progress = 100
                 progression.visibility = View.GONE
             }
         }
@@ -183,6 +188,7 @@ class ContractDetailFragment : Fragment() {
             val addressContractSafe = address ?: ""
             lifecycleScope.launch {
                 progression.visibility = View.VISIBLE
+                progression.progress = 10
                 try{
                     val approvehash = blockChainCalls.approveTokenTransfer(
                         addressAssicuratosafe,
@@ -198,6 +204,7 @@ class ContractDetailFragment : Fragment() {
                         progression.visibility = View.GONE
                         return@launch
                     }
+                    progression.progress = 50
                 }
                 catch (e: Exception) {
                     Log.e("ContractDetailActivity", "Error during activation process", e)
@@ -213,12 +220,14 @@ class ContractDetailFragment : Fragment() {
                         progression.visibility = View.GONE
                         return@launch
                     }
+                    progression.progress = 75
                 }
                 catch (e: Exception) {
                     Log.e("ContractDetailActivity", "Error during activation process", e)
                     progression.visibility = View.GONE
                 }
                 contractDetailViewModel.fetchContractDetails(addressContractSafe)
+                progression.progress = 100
                 progression.visibility = View.GONE
             }
         }
@@ -238,6 +247,7 @@ class ContractDetailFragment : Fragment() {
             }
             lifecycleScope.launch {
                 progression.visibility = View.VISIBLE
+                progression.progress = 10
                 try {
                     val approvehash = blockChainCalls.approveTokenTransfer(
                         addressAssicuratoresafe,
@@ -254,6 +264,7 @@ class ContractDetailFragment : Fragment() {
                         progression.visibility = View.GONE
                         return@launch
                     }
+                    progression.progress = 50
                 } catch (e: Exception) {
                     Log.e("ContractDetailActivity", "Error during funding process", e)
                 }
@@ -268,11 +279,14 @@ class ContractDetailFragment : Fragment() {
                         progression.visibility = View.GONE
                         return@launch
                     }
+                    progression.progress = 75
                 } catch (e: Exception) {
                     Log.e("ContractDetailActivity", "Error during funding process", e)
                     progression.visibility = View.GONE
                 }
                 contractDetailViewModel.fetchContractDetails(addressContractSafe)
+                progression.progress = 100
+
                 progression.visibility = View.GONE
             }
         }
