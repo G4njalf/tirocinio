@@ -15,7 +15,13 @@ import com.example.myapplication.databinding.ActivityMainBinding
 import android.util.Log
 import android.view.MenuItem
 import android.content.Intent
+import android.net.Uri
 import android.widget.TextView
+import androidx.core.net.toUri
+import com.reown.android.Core
+import com.reown.android.CoreClient
+import com.reown.appkit.client.AppKit
+import com.reown.appkit.client.Modal
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,16 +47,6 @@ class MainActivity : AppCompatActivity() {
             addressTextViewNav.text = sharedPreferences.getString("user_address", "Indirizzo non disponibile")
             setSupportActionBar(binding.appBarMain.toolbar)
 
-            /*
-            vecchia azione del fab (il pulsante in basso a destra)
-            binding.appBarMain.fab.setOnClickListener { view ->
-                Snackbar.make(view, "Azione per il cliente", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null)
-                    .setAnchorView(R.id.fab).show()
-            }*/
-
-
-
         } else if (userRole == "assicuratore") {
             // Carica il layout per l'assicuratore
             binding = ActivityMainBinding.inflate(layoutInflater)
@@ -62,11 +58,6 @@ class MainActivity : AppCompatActivity() {
 
             setSupportActionBar(binding.appBarMain.toolbar)
 
-            /*binding.appBarMain.fab.setOnClickListener { view ->
-                Snackbar.make(view, "Azione per l'assicuratore", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null)
-                    .setAnchorView(R.id.fab).show()
-            }*/
         }
 
         // Configura il Navigation Drawer
@@ -116,6 +107,58 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish() // Chiude la MainActivity
                 true
+            }
+            R.id.action_connect -> {
+
+                /*val pairings = CoreClient.Pairing.getPairings()
+                Log.d("MainActivity", "Existing pairings: ${pairings}")
+                val pairing = if (pairings.isNotEmpty()) {
+                    pairings.first() // Usa il primo pairing disponibile
+                } else {
+                    CoreClient.Pairing.create() ?: throw IllegalStateException("Failed to create pairing")
+                }*/
+
+                val pairing = CoreClient.Pairing.create() ?: throw IllegalStateException("Failed to create pairing")
+                val uri = "metamask://wc?uri=" + Uri.encode(pairing.uri)
+                Log.d("MainActivity", "Opening MetaMask with URI: $uri")
+                val intent = Intent(Intent.ACTION_VIEW,uri.toUri())
+                startActivity(intent)
+
+                AppKit.connect(
+                    connectParams = Modal.Params.ConnectParams(
+                        sessionNamespaces = mapOf(
+                            "eip155" to Modal.Model.Namespace.Proposal(
+                                chains = listOf("eip155:11155111"),
+                                methods = listOf("eth_sendTransaction", "personal_sign", "eth_sign", "eth_accounts"),
+                                events = listOf("chainChanged", "accountsChanged")
+                            )
+                        ),
+
+                        pairing = pairing
+                    ),
+                    onSuccess = { session: String ->
+                        Log.i("MainActivity", "Connected: $session")
+                        /*AppKit.request(
+                            request = com.reown.appkit.client.models.request.Request(
+                                method = "eth_accounts",       // Metodo per leggere l'account connesso
+                                params = ""       // Nessun parametro richiesto
+                            ),
+                            onSuccess = { result ->
+                                Log.d("MainActivity", "eth_accounts result: $result")
+                                val accounts = result as List<String>  // Lista di address
+                                Log.i("MainActivity", "Accounts connessi: $accounts")
+                                // Aggiorna la UI o salva l'account nell'app
+                            },
+                            onError = { error ->
+                                Log.e("MainActivity", "Errore nel leggere account: ${error.message}")
+                            }
+                        )*/
+                    },
+                    onError = { error: Modal.Model.Error ->
+                        Log.e("MainActivity", "Connection failed: ${error.throwable.message}", error.throwable)
+                    }
+                )
+                return true
             }
             else -> super.onOptionsItemSelected(item)
         }

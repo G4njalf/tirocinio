@@ -7,6 +7,7 @@ import com.reown.android.CoreClient
 import com.reown.android.relay.ConnectionType
 import com.reown.appkit.client.AppKit
 import com.reown.appkit.client.Modal
+import com.reown.appkit.presets.AppKitChainsPresets
 
 
 class MyApplication : Application() {
@@ -39,5 +40,7 @@ class MyApplication : Application() {
                 Log.e("MyApplication",error.toString())
             }
         )
+
+        AppKit.setChains(AppKitChainsPresets.ethChains.values.toList())
     }
 }

@@ -6,4 +6,9 @@
         android:icon="@drawable/baseline_logout_24"
         android:title="@string/action_logout"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_connect"
+        android:icon="@drawable/ic_wallet_connect_logo"
+        android:title="@string/action_connect"
+        app:showAsAction="always"/>
 </menu>
