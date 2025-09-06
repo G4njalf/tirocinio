@@ -22,11 +22,19 @@ import com.reown.android.Core
 import com.reown.android.CoreClient
 import com.reown.appkit.client.AppKit
 import com.reown.appkit.client.Modal
+import com.reown.appkit.client.models.Session
+import androidx.core.content.edit
+import androidx.lifecycle.lifecycleScope
+import com.example.myapplication.data.BlockChainCalls
+import kotlinx.coroutines.launch
+import java.math.BigInteger
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+
+    private var dummyBool = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("MainActivity", "onCreate called")
@@ -119,6 +127,11 @@ class MainActivity : AppCompatActivity() {
                 }*/
 
                 val pairing = CoreClient.Pairing.create() ?: throw IllegalStateException("Failed to create pairing")
+
+                val getPairing = CoreClient.Pairing.getPairings()
+
+                Log.d("MainActivity", "get pairing: $getPairing")
+
                 val uri = "metamask://wc?uri=" + Uri.encode(pairing.uri)
                 Log.d("MainActivity", "Opening MetaMask with URI: $uri")
                 val intent = Intent(Intent.ACTION_VIEW,uri.toUri())
@@ -129,7 +142,12 @@ class MainActivity : AppCompatActivity() {
                         sessionNamespaces = mapOf(
                             "eip155" to Modal.Model.Namespace.Proposal(
                                 chains = listOf("eip155:11155111"),
-                                methods = listOf("eth_sendTransaction", "personal_sign", "eth_sign", "eth_accounts"),
+                                methods = listOf(
+                                    "eth_sendTransaction",
+                                    "personal_sign",
+                                    "eth_sign",
+                                    "eth_accounts",
+                                    "eth_call"),
                                 events = listOf("chainChanged", "accountsChanged")
                             )
                         ),
@@ -138,21 +156,7 @@ class MainActivity : AppCompatActivity() {
                     ),
                     onSuccess = { session: String ->
                         Log.i("MainActivity", "Connected: $session")
-                        /*AppKit.request(
-                            request = com.reown.appkit.client.models.request.Request(
-                                method = "eth_accounts",       // Metodo per leggere l'account connesso
-                                params = ""       // Nessun parametro richiesto
-                            ),
-                            onSuccess = { result ->
-                                Log.d("MainActivity", "eth_accounts result: $result")
-                                val accounts = result as List<String>  // Lista di address
-                                Log.i("MainActivity", "Accounts connessi: $accounts")
-                                // Aggiorna la UI o salva l'account nell'app
-                            },
-                            onError = { error ->
-                                Log.e("MainActivity", "Errore nel leggere account: ${error.message}")
-                            }
-                        )*/
+                        dummyBool = true
                     },
                     onError = { error: Modal.Model.Error ->
                         Log.e("MainActivity", "Connection failed: ${error.throwable.message}", error.throwable)
@@ -162,5 +166,53 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val session = AppKit.getSession()
+        Log.d("MainActivity", "Current session: $session")
+        val account = AppKit.getAccount()
+        Log.d("MainActivity", "Current account: $account")
+        val pairings = CoreClient.Pairing.getPairings()
+        Log.d("MainActivity", "Current pairings: $pairings")
+
+        if (session != null) {
+            when (session) {
+                is Session.WalletConnectSession -> {
+                    val sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
+                    sharedPreferences.edit() {
+                        putString("session_pairingTopic", session.pairingTopic)
+                        putString("session_topic", session.topic)
+                    }
+                    Log.d("MainActivity", "Wallet connect session saved with topic: ${session.topic}")
+                }
+
+                else -> {
+                    Log.w("MainActivity", "Coinbase Wallet session not handled")
+                }
+            }
+        }
+
+        if (account != null) {
+            val sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
+            sharedPreferences.edit() {
+                putString("user_address", account.address)
+            }
+            Log.d("MainActivity", "Account address saved: ${account.address}")
+        } else {
+            Log.w("MainActivity", "No account available")
+        }
+
+        if (dummyBool){
+            val blockChainCalls = BlockChainCalls()
+            lifecycleScope.launch {
+              blockChainCalls.mintTokens("0x8C6b618aC0b1E69FA7FF02Ec2a8EB6caDC29bc86", BigInteger.valueOf(100000))
+            }
+        }
+
+        dummyBool = false
+
+
     }
 }

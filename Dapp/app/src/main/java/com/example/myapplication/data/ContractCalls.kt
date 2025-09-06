@@ -16,7 +16,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import com.example.myapplication.BuildConfig
+import com.reown.android.CoreInterface
+import com.reown.android.internal.common.JsonRpcResponse
+import com.reown.appkit.client.AppKit
+import com.reown.appkit.client.Modal
+import com.reown.appkit.client.models.request.Request
+import com.reown.appkit.client.models.request.SentRequestResult
+import com.squareup.moshi.Json
 import org.web3j.abi.datatypes.Bool
 import org.web3j.abi.datatypes.generated.Uint256
 import org.web3j.abi.datatypes.DynamicArray
@@ -26,6 +34,10 @@ import org.web3j.utils.Numeric
 import java.math.BigInteger
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
+import org.json.JSONArray
+import org.json.JSONObject
+import kotlin.coroutines.resumeWithException
 
 
 class DynamicAddressArray(addresses: List<Address>) : DynamicArray<Address>(Address::class.java, addresses)
@@ -127,7 +139,7 @@ class BlockChainCalls{
         return@withContext response.transactionHash
     }
 
-    suspend fun mintTokens(reciver: String, amount: BigInteger) : String = withContext(Dispatchers.IO) {
+    /*suspend fun mintTokensold(reciver: String, amount: BigInteger) : String = withContext(Dispatchers.IO) {
 
         val function = Function(
             "mint",
@@ -137,7 +149,7 @@ class BlockChainCalls{
 
         val encodedFunction = FunctionEncoder.encode(function)
 
-        val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
+        val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicurato) // controllareeee
         val nonce = web3.ethGetTransactionCount(tokenOwnerAddress, DefaultBlockParameterName.PENDING)
             .send().transactionCount
 
@@ -169,6 +181,71 @@ class BlockChainCalls{
         }
 
         return@withContext response.transactionHash
+    }*/
+
+    suspend fun mintTokens(reciver: String, amount: BigInteger) : String = withContext(Dispatchers.IO) {
+
+        val function = Function(
+            "mint",
+            listOf(Address(reciver), Uint256(amount)),
+            emptyList()
+        )
+
+        val encodedFunction = FunctionEncoder.encode(function)
+
+        // Crea la transazione
+        val tx = JSONObject()
+        tx.put("from", tokenOwnerAddress) // da cambiare
+        tx.put("to", mytokenAddress)
+        tx.put("data", encodedFunction)
+        tx.put("chainId", "0xAA36A7") // Sepolia chain ID in esadecimale
+
+        // Parametri come array JSON
+        val paramsArray = JSONArray()
+        paramsArray.put(tx)
+        //paramsArray.put("latest") serve solo per eth_call?
+
+        val request = com.reown.appkit.client.models.request.Request(
+            method = "eth_sendTransaction",
+            params = paramsArray.toString()
+        )
+
+        var txHash = ""
+
+        AppKit.setDelegate(object : AppKit.ModalDelegate {
+            override fun onSessionRequestResponse(response: Modal.Model.SessionRequestResponse) {
+                Log.i("DelegateTest", "Ricevuto evento: $response")
+                txHash = (response.result as Modal.Model.JsonRpcResponse.JsonRpcResult).result
+                Log.d("DelegateTest", "Transaction hash: $txHash")
+            }
+            override fun onSessionApproved(session: Modal.Model.ApprovedSession) {}
+            override fun onSessionRejected(session: Modal.Model.RejectedSession) {}
+            override fun onSessionUpdate(session: Modal.Model.UpdatedSession) {}
+            override fun onSessionEvent(sessionEvent: Modal.Model.Event) {}
+            override fun onSessionEvent(sessionEvent: Modal.Model.SessionEvent) {}
+            override fun onSessionExtend(session: Modal.Model.Session) {}
+            override fun onSessionDelete(session: Modal.Model.DeletedSession) {}
+            override fun onSessionAuthenticateResponse(sessionAuthenticateResponse: Modal.Model.SessionAuthenticateResponse) {}
+            override fun onSIWEAuthenticationResponse(response: Modal.Model.SIWEAuthenticateResponse) {}
+            override fun onProposalExpired(proposal: Modal.Model.ExpiredProposal) {}
+            override fun onRequestExpired(request: Modal.Model.ExpiredRequest) {}
+            override fun onConnectionStateChange(state: Modal.Model.ConnectionState) {}
+            override fun onError(error: Modal.Model.Error) {
+                Log.e("DelegateTest", "Errore: ${error.throwable.message}", error.throwable)
+            }
+        })
+
+        AppKit.request(
+            request = request,
+            onSuccess = { result ->
+                Log.i("mintTokens", "Transaction hash: $result")
+            },
+            onError = { error ->
+                Log.e("mintTokens", "Transaction failed: ${error.message}")
+            }
+        )
+
+        return@withContext txHash
     }
 
 }
