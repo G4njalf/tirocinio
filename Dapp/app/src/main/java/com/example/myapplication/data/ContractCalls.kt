@@ -45,12 +45,13 @@ class DynamicAddressArray(addresses: List<Address>) : DynamicArray<Address>(Addr
 private val infuraurl = BuildConfig.INFURA_URL
 
 private val web3 = Web3j.build(HttpService(infuraurl))
+
 //HARDCODE DA TOGLIERE PRIMA O POI
-private val myAddressOLD = "0x8C6b618aC0b1E69FA7FF02Ec2a8EB6caDC29bc86"
-private val myAddress = "0x5F09F774d9725b4eA6B4A9a356BaDf54760374bc"
+//private val myAddressOLD = "0x8C6b618aC0b1E69FA7FF02Ec2a8EB6caDC29bc86"
+//private val myAddress = "0x5F09F774d9725b4eA6B4A9a356BaDf54760374bc"
 private val tokenOwnerAddress = "0x8C6b618aC0b1E69FA7FF02Ec2a8EB6caDC29bc86"
 private val mytokenAddress = "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f"
-private val factoryAddressOLD = "0xAc12bd15e865e156bC712aeeaC6E6092b53BA6D3" // vecchio che va
+//private val factoryAddressOLD = "0xAc12bd15e865e156bC712aeeaC6E6092b53BA6D3" // vecchio che va
 private val factoryAddress = "0xFAD9CF31f457b0880fA6E1C612F988ab69c53317"
 private val privateKeyAssicuratore = BuildConfig.PRIVATE_KEY_ASSICURATORE
 private val privateKeyAssicurato = BuildConfig.PRIVATE_KEY_ASSICURATO
@@ -139,7 +140,7 @@ class BlockChainCalls{
         return@withContext response.transactionHash
     }
 
-    /*suspend fun mintTokensold(reciver: String, amount: BigInteger) : String = withContext(Dispatchers.IO) {
+    /*suspend fun mintTokens(reciver: String, amount: BigInteger) : String = withContext(Dispatchers.IO) {
 
         val function = Function(
             "mint",
@@ -276,11 +277,11 @@ class ContractCalls {
 
     // Function to create a new insurance contract from the factory contract
 
-    suspend fun createNewContract(addrAssicurato: String, premio: Uint256): String = withContext(Dispatchers.IO){
+    suspend fun createNewContract(addrAssicuratore: String,addrAssicurato: String, premio: Uint256): String = withContext(Dispatchers.IO){
 
         val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
 
-        val nonce = web3.ethGetTransactionCount(myAddress, DefaultBlockParameterName.PENDING)
+        val nonce = web3.ethGetTransactionCount(addrAssicuratore, DefaultBlockParameterName.PENDING)
             .send().transactionCount
 
         val basegasPrice = web3.ethGasPrice().send().gasPrice
@@ -333,7 +334,7 @@ class ContractCalls {
 
     // Function to get the address of the insurance contract created by the factory contract
 
-    suspend fun getAllInsuranceContracts(): List<String> = withContext(Dispatchers.IO) {
+    suspend fun getAllInsuranceContracts(addrAssicuratore: String): List<String> = withContext(Dispatchers.IO) {
         val function = Function(
             "getAllInsuranceContracts",
             emptyList(), // no inputs
@@ -343,7 +344,7 @@ class ContractCalls {
         val encodedFunction = FunctionEncoder.encode(function)
 
         val response = web3.ethCall(
-            Transaction.createEthCallTransaction(myAddress, factoryAddress, encodedFunction),
+            Transaction.createEthCallTransaction(addrAssicuratore, factoryAddress, encodedFunction),
             DefaultBlockParameterName.LATEST
         ).send()
 
@@ -356,7 +357,7 @@ class ContractCalls {
 
     }
 
-    suspend fun getInsuranceContractsByInsured(insuredAddress: String) : List<String> = withContext(Dispatchers.IO) {
+    suspend fun getInsuranceContractsByInsured(addrAssicuratore: String,insuredAddress: String) : List<String> = withContext(Dispatchers.IO) {
         val function = Function(
             "getInsuranceContractsByInsured",
             listOf(Address(insuredAddress)),
@@ -366,7 +367,7 @@ class ContractCalls {
         val encodedFunction = FunctionEncoder.encode(function)
 
         val response = web3.ethCall(
-            Transaction.createEthCallTransaction(myAddress, factoryAddress, encodedFunction),
+            Transaction.createEthCallTransaction(addrAssicuratore, factoryAddress, encodedFunction),
             DefaultBlockParameterName.LATEST
         ).send()
 
@@ -380,7 +381,7 @@ class ContractCalls {
 
     // Function to get the variables of a specific insurance contract
 
-    suspend fun getContractVariables(contractAddress: String): Map<String, Any> = withContext(Dispatchers.IO) {
+    suspend fun getContractVariables(addrAssicuratore: String,contractAddress: String): Map<String, Any> = withContext(Dispatchers.IO) {
         val assicuratoreFunction = Function(
             "assicuratore",
             emptyList(),
@@ -459,7 +460,7 @@ class ContractCalls {
         for ((name, function) in functions) {
             val encodedFunction = FunctionEncoder.encode(function)
             val response = web3.ethCall(
-                Transaction.createEthCallTransaction(myAddress, contractAddress, encodedFunction),
+                Transaction.createEthCallTransaction(addrAssicuratore, contractAddress, encodedFunction),
                 DefaultBlockParameterName.LATEST
             ).send()
 
@@ -481,11 +482,11 @@ class ContractCalls {
 
     // Function to fund the insurance contract ( l assicuratore deve inviare i fondi al contratto)
 
-    suspend fun fundContract(contractAddress: String): String = withContext(Dispatchers.IO){
+    suspend fun fundContract(addrAssicuratore: String,contractAddress: String): String = withContext(Dispatchers.IO){
 
         val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
 
-        val nonce = web3.ethGetTransactionCount(myAddress, DefaultBlockParameterName.PENDING)
+        val nonce = web3.ethGetTransactionCount(addrAssicuratore, DefaultBlockParameterName.PENDING)
             .send().transactionCount
 
         val basegasPrice = web3.ethGasPrice().send().gasPrice

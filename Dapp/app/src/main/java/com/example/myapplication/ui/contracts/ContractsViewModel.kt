@@ -48,13 +48,13 @@ class ContractsViewModel (application: Application) : AndroidViewModel(applicati
         viewModelScope.launch {
             try {
                 val contractAddresses: List<String> = when (userRole) {
-                    "cliente" -> contractCalls.getInsuranceContractsByInsured(userAddress)
-                    "assicuratore" -> contractCalls.getAllInsuranceContracts()
+                    "cliente" -> contractCalls.getInsuranceContractsByInsured(userAddress,userAddress)
+                    "assicuratore" -> contractCalls.getAllInsuranceContracts(userAddress)
                     else -> emptyList()
                 }
                 val contractList = mutableListOf<Contract>()
                 for (address in contractAddresses){
-                    val data = contractCalls.getContractVariables(address)
+                    val data = contractCalls.getContractVariables(userAddress,address)
                     Log.d("data", "Contract data for $address: $data")
                     if (data["assicurato"].toString() != userAddress.lowercase() && (userRole == "cliente")){ // normalizzo userAddress perche me li da tutto minuscolo dall bc
                         Log.wtf("loadContracts", "Contract $address is not associated with the user address $userAddress")

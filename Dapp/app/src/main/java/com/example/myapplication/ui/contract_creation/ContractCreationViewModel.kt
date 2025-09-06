@@ -1,10 +1,13 @@
 package com.example.myapplication.ui.contract_creation
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
+import androidx.lifecycle.AndroidViewModel
 import com.example.myapplication.data.BlockChainCalls
 import com.example.myapplication.data.ContractCalls
 import androidx.lifecycle.viewModelScope
@@ -12,11 +15,15 @@ import kotlinx.coroutines.launch
 import org.web3j.abi.datatypes.generated.Uint256
 import com.example.myapplication.data.ContractRepository
 
-class ContractCreationViewModel : ViewModel() {
+class ContractCreationViewModel(application: Application) : AndroidViewModel(application) {
 
     private val blockChainCalls = BlockChainCalls()
     private val contractCalls = ContractCalls()
     private val contractRepository = ContractRepository()
+
+    private val editor = application.getSharedPreferences("UserPrefs", MODE_PRIVATE)
+
+    private val usraddress = editor.getString("user_address", null) ?: ""
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
@@ -46,7 +53,7 @@ class ContractCreationViewModel : ViewModel() {
             }
             if (isValid) {
                 try {
-                    txHash = contractCalls.createNewContract(address, Uint256(premio.toLong()))
+                    txHash = contractCalls.createNewContract(usraddress,address,Uint256(premio.toLong()))
                     Log.d("ContractCreationViewModel", "Contract created transaction Hash: $txHash")
 
                 } catch (e: Exception) {
@@ -57,7 +64,7 @@ class ContractCreationViewModel : ViewModel() {
                     val receipt = blockChainCalls.waitForReceipt(txHash)
                     if (receipt.status == "0x1") {
                         Log.d("ContractCreationViewModel", "Transaction successful: $txHash")
-                        contractAddress = contractCalls.getAllInsuranceContracts().lastOrNull() ?: ""
+                        contractAddress = contractCalls.getAllInsuranceContracts(usraddress).lastOrNull() ?: ""
 
                         Log.d("ContractCreationViewModel", "Last contract address: $contractAddress")
                     } else {
@@ -69,7 +76,7 @@ class ContractCreationViewModel : ViewModel() {
                     Log.e("ContractCreationViewModel", "Error fetching last contract address", e)
                 }
                 try {
-                    val contractData = contractCalls.getContractVariables(contractAddress)
+                    val contractData = contractCalls.getContractVariables(usraddress,contractAddress)
                     /*contractRepository.addContract(
                         contractAddress,
                         contractData["premio"] as UInt,

@@ -14,7 +14,7 @@ class ContractDetailViewModel(application: Application) : AndroidViewModel(appli
 
     val editor = application.getSharedPreferences("UserPrefs", MODE_PRIVATE)
     val userRole = editor.getString("user_role", null)
-    val userAddress = editor.getString("user_address", null)
+    val userAddress = editor.getString("user_address" , null) ?: ""
 
     private val _userRoleText = MutableLiveData<String>().apply {
         value = userRole
@@ -29,7 +29,7 @@ class ContractDetailViewModel(application: Application) : AndroidViewModel(appli
         val contractCalls = ContractCalls()
         viewModelScope.launch {
             try {
-                val data = contractCalls.getContractVariables(contractAddress)
+                val data = contractCalls.getContractVariables(userAddress,contractAddress)
                 // Aggiorna la UI con i dati freschi
                 isLiquidato.postValue(data["liquidato"] as Boolean)
                 isAttivato.postValue(data["attivato"] as Boolean)

@@ -125,6 +125,26 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     CoreClient.Pairing.create() ?: throw IllegalStateException("Failed to create pairing")
                 }*/
+                if (getSharedPreferences("UserPrefs", MODE_PRIVATE).getString("session_topic", null) != null){
+
+                    //check if the data are still valid
+
+                    val session = AppKit.getSession()
+
+                    if(session == null){
+                        Log.i("MainActivity", "No active session found, clearing saved session data")
+                        //clear the saved data
+                        getSharedPreferences("UserPrefs", MODE_PRIVATE).edit() {
+                            remove("session_topic")
+                            remove("session_pairingTopic")
+                            remove("user_address")
+                        }
+                    }
+                    else{
+                        Log.i("MainActivity", "Active session found, no need to connect")
+                        return true
+                    }
+                }
 
                 val pairing = CoreClient.Pairing.create() ?: throw IllegalStateException("Failed to create pairing")
 
@@ -193,7 +213,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
         if (account != null) {
             val sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
             sharedPreferences.edit() {
@@ -204,14 +223,6 @@ class MainActivity : AppCompatActivity() {
             Log.w("MainActivity", "No account available")
         }
 
-        if (dummyBool){
-            val blockChainCalls = BlockChainCalls()
-            lifecycleScope.launch {
-              blockChainCalls.mintTokens("0x8C6b618aC0b1E69FA7FF02Ec2a8EB6caDC29bc86", BigInteger.valueOf(100000))
-            }
-        }
-
-        dummyBool = false
 
 
     }

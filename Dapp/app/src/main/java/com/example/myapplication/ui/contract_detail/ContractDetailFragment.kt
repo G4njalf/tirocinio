@@ -43,7 +43,7 @@ class ContractDetailFragment : Fragment() {
         val contractCalls = ContractCalls()
         val blockChainCalls = BlockChainCalls()
 
-
+        val usrAddress = contractDetailViewModel.userAddress
 
         val activateBtn = binding.activateContractbtn
         val liquidateBtn = binding.liquidateContractBtn
@@ -131,7 +131,7 @@ class ContractDetailFragment : Fragment() {
                     if (recipt.status == "0x1") {
                         Log.d("ContractDetailActivity", "Zonia request successful")
 
-                        val requestId = contractCalls.getContractVariables(addressContractSafe)["requestId"] as? String
+                        val requestId = contractCalls.getContractVariables(usrAddress,addressContractSafe)["requestId"] as? String
                         Toast.makeText(requireContext(), "Zonia request successful with ID: $requestId", Toast.LENGTH_LONG).show()
                     }
                     else {
@@ -269,7 +269,7 @@ class ContractDetailFragment : Fragment() {
                     Log.e("ContractDetailActivity", "Error during funding process", e)
                 }
                 try {
-                    val fundhash = contractCalls.fundContract(addressContractSafe)
+                    val fundhash = contractCalls.fundContract(usrAddress,addressContractSafe)
                     val recipt = blockChainCalls.waitForReceipt(fundhash)
                     Log.d("ContractDetailActivity", "Recipt: $recipt")
                     if (recipt.status == "0x1") {
