@@ -196,6 +196,7 @@ class ContractDetailFragment : Fragment() {
                         activateamountsafe,
                         contractDetailViewModel.userRole?:"",
                         "0xF9f3AE879C612D35a8D1CAa67e178f190a4a215f")
+                    Log.d("ContractDetailActivity", "Approve hash: $approvehash")
                     val recipt = blockChainCalls.waitForReceipt(approvehash)
                     if (recipt.status == "0x1") {
                         Log.d("ContractDetailActivity", "Token transfer approved successfully")

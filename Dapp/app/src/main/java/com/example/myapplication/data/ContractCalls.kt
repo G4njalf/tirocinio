@@ -90,7 +90,7 @@ class BlockChainCalls{
         throw Exception("Transaction receipt not found") // Gestione del caso in cui il ciclo non restituisce mai un valore
     }
 
-    suspend fun approveTokenTransfer(userAddress: String,spenderAddress: String, amount: BigInteger, role: String, tokenAddress: String )
+    /*suspend fun approveTokenTransfer(userAddress: String,spenderAddress: String, amount: BigInteger, role: String, tokenAddress: String )
     : String = withContext(Dispatchers.IO) {
 
         val function = Function(
@@ -138,6 +138,77 @@ class BlockChainCalls{
         }
 
         return@withContext response.transactionHash
+    }*/
+    suspend fun approveTokenTransfer(
+        userAddress: String,
+        spenderAddress: String,
+        amount: BigInteger,
+        role: String,
+        tokenAddress: String
+    ): String = withContext(Dispatchers.IO) {
+
+        val function = Function(
+            "approve",
+            listOf(Address(spenderAddress), Uint256(amount)),
+            listOf(TypeReference.create(org.web3j.abi.datatypes.Bool::class.java))
+        )
+
+        val encodedFunction = FunctionEncoder.encode(function)
+
+        val tx = JSONObject().apply {
+            put("from", userAddress)
+            put("to", tokenAddress)
+            put("data", encodedFunction)
+            put("chainId", "0xAA36A7")
+        }
+
+        val paramsArray = JSONArray().apply { put(tx) }
+
+        val request = com.reown.appkit.client.models.request.Request(
+            method = "eth_sendTransaction",
+            params = paramsArray.toString()
+        )
+
+        val deferred = kotlinx.coroutines.CompletableDeferred<String>()
+
+        AppKit.setDelegate(object : AppKit.ModalDelegate {
+            override fun onSessionRequestResponse(response: Modal.Model.SessionRequestResponse) {
+                val hash = (response.result as Modal.Model.JsonRpcResponse.JsonRpcResult).result
+                Log.d("DelegateTest", "Transaction hash: $hash")
+                if (!deferred.isCompleted) deferred.complete(hash)
+            }
+
+            override fun onSessionUpdate(updatedSession: Modal.Model.UpdatedSession) {}
+
+            override fun onConnectionStateChange(state: Modal.Model.ConnectionState) {}
+
+            override fun onError(error: Modal.Model.Error) {
+                Log.e("DelegateTest", "Errore: ${error.throwable.message}", error.throwable)
+                if (!deferred.isCompleted) deferred.completeExceptionally(error.throwable)
+            }
+            override fun onProposalExpired(proposal: Modal.Model.ExpiredProposal) {}
+            override fun onRequestExpired(request: Modal.Model.ExpiredRequest) {}
+            override fun onSessionApproved(approvedSession: Modal.Model.ApprovedSession) {}
+            override fun onSessionDelete(deletedSession: Modal.Model.DeletedSession) {}
+            override fun onSessionEvent(sessionEvent: Modal.Model.SessionEvent) {}
+            override fun onSessionExtend(session: Modal.Model.Session) {}
+            override fun onSessionRejected(rejectedSession: Modal.Model.RejectedSession) {}
+
+        })
+
+        AppKit.request(
+            request = request,
+            onSuccess = { result ->
+                Log.i("approveTokenTransfer", "Transaction hash: $result")
+            },
+            onError = { error ->
+                Log.e("approveTokenTransfer", "Transaction failed: ${error.message}")
+            }
+        )
+
+        val txHash = deferred.await()
+        Log.d("approveTokenTransfer", "Final transaction hash: $txHash")
+        return@withContext txHash
     }
 
     /*suspend fun mintTokens(reciver: String, amount: BigInteger) : String = withContext(Dispatchers.IO) {
@@ -277,7 +348,7 @@ class ContractCalls {
 
     // Function to create a new insurance contract from the factory contract
 
-    suspend fun createNewContract(addrAssicuratore: String,addrAssicurato: String, premio: Uint256): String = withContext(Dispatchers.IO){
+    /*suspend fun createNewContract(addrAssicuratore: String,addrAssicurato: String, premio: Uint256): String = withContext(Dispatchers.IO){
 
         val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
 
@@ -329,6 +400,80 @@ class ContractCalls {
         val txHash = response.transactionHash
         Log.d("createNewContract", "Tx hash: $txHash")
 
+        return@withContext txHash
+    }*/
+
+    suspend fun createNewContract(addrAssicuratore: String,addrAssicurato: String, premio: Uint256): String = withContext(Dispatchers.IO){
+
+        val function = Function(
+            "createInsurance",
+            listOf(
+                Address(addrAssicurato),
+                Uint256(premio.value)
+            ), // inputs
+            listOf(
+                TypeReference.create(org.web3j.abi.datatypes.Address::class.java) // output type
+            )
+        )
+
+        val encodedFunction = FunctionEncoder.encode(function)
+
+        // Crea la transazione
+        val tx = JSONObject()
+        tx.put("from", addrAssicuratore) // da cambiare
+        tx.put("to", factoryAddress)
+        tx.put("data", encodedFunction)
+        tx.put("chainId", "0xAA36A7") // Sepolia chain ID in esadecimale
+
+        // Parametri come array JSON
+        val paramsArray = JSONArray()
+        paramsArray.put(tx)
+        //paramsArray.put("latest") serve solo per eth_call?
+
+        val request = com.reown.appkit.client.models.request.Request(
+            method = "eth_sendTransaction",
+            params = paramsArray.toString()
+        )
+
+        val deferred = kotlinx.coroutines.CompletableDeferred<String>()
+
+        AppKit.setDelegate(object : AppKit.ModalDelegate {
+            override fun onSessionRequestResponse(response: Modal.Model.SessionRequestResponse) {
+                val hash = (response.result as Modal.Model.JsonRpcResponse.JsonRpcResult).result
+                Log.d("DelegateTest", "Transaction hash: $hash")
+                if (!deferred.isCompleted) deferred.complete(hash)
+            }
+
+            override fun onSessionUpdate(updatedSession: Modal.Model.UpdatedSession) {}
+
+            override fun onConnectionStateChange(state: Modal.Model.ConnectionState) {}
+
+            override fun onError(error: Modal.Model.Error) {
+                Log.e("DelegateTest", "Errore: ${error.throwable.message}", error.throwable)
+                if (!deferred.isCompleted) deferred.completeExceptionally(error.throwable)
+            }
+            override fun onProposalExpired(proposal: Modal.Model.ExpiredProposal) {}
+            override fun onRequestExpired(request: Modal.Model.ExpiredRequest) {}
+            override fun onSessionApproved(approvedSession: Modal.Model.ApprovedSession) {}
+            override fun onSessionDelete(deletedSession: Modal.Model.DeletedSession) {}
+            override fun onSessionEvent(sessionEvent: Modal.Model.SessionEvent) {}
+            override fun onSessionExtend(session: Modal.Model.Session) {}
+            override fun onSessionRejected(rejectedSession: Modal.Model.RejectedSession) {}
+
+        })
+
+        AppKit.request(
+            request = request,
+            onSuccess = { result ->
+                Log.i("approveTokenTransfer", "Transaction hash: $result")
+            },
+            onError = { error ->
+                Log.e("approveTokenTransfer", "Transaction failed: ${error.message}")
+            }
+        )
+
+        val txHash = deferred.await()
+        Log.d("approveTokenTransfer", "Final transaction hash: $txHash")
         return@withContext txHash
     }
 
@@ -482,7 +627,7 @@ class ContractCalls {
 
     // Function to fund the insurance contract ( l assicuratore deve inviare i fondi al contratto)
 
-    suspend fun fundContract(addrAssicuratore: String,contractAddress: String): String = withContext(Dispatchers.IO){
+    /*suspend fun fundContract(addrAssicuratore: String,contractAddress: String): String = withContext(Dispatchers.IO){
 
         val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicuratore)
 
@@ -528,11 +673,79 @@ class ContractCalls {
         val txHash = response.transactionHash
 
         return@withContext txHash
+    }*/
+
+    suspend fun fundContract(addrAssicuratore: String,contractAddress: String): String = withContext(Dispatchers.IO){
+
+        val function = Function(
+            "fundContract",
+            emptyList(),
+            emptyList() // output type
+        )
+        val encodedFunction = FunctionEncoder.encode(function)
+
+        // Crea la transazione
+        val tx = JSONObject()
+        tx.put("from", addrAssicuratore) // da cambiare
+        tx.put("to", contractAddress)
+        tx.put("data", encodedFunction)
+        tx.put("chainId", "0xAA36A7") // Sepolia chain ID in esadecimale
+
+        // Parametri come array JSON
+        val paramsArray = JSONArray()
+        paramsArray.put(tx)
+        //paramsArray.put("latest") serve solo per eth_call?
+
+        val request = com.reown.appkit.client.models.request.Request(
+            method = "eth_sendTransaction",
+            params = paramsArray.toString()
+        )
+
+        val deferred = kotlinx.coroutines.CompletableDeferred<String>()
+
+        AppKit.setDelegate(object : AppKit.ModalDelegate {
+            override fun onSessionRequestResponse(response: Modal.Model.SessionRequestResponse) {
+                val hash = (response.result as Modal.Model.JsonRpcResponse.JsonRpcResult).result
+                Log.d("DelegateTest", "Transaction hash: $hash")
+                if (!deferred.isCompleted) deferred.complete(hash)
+            }
+
+            override fun onSessionUpdate(updatedSession: Modal.Model.UpdatedSession) {}
+
+            override fun onConnectionStateChange(state: Modal.Model.ConnectionState) {}
+
+            override fun onError(error: Modal.Model.Error) {
+                Log.e("DelegateTest", "Errore: ${error.throwable.message}", error.throwable)
+                if (!deferred.isCompleted) deferred.completeExceptionally(error.throwable)
+            }
+            override fun onProposalExpired(proposal: Modal.Model.ExpiredProposal) {}
+            override fun onRequestExpired(request: Modal.Model.ExpiredRequest) {}
+            override fun onSessionApproved(approvedSession: Modal.Model.ApprovedSession) {}
+            override fun onSessionDelete(deletedSession: Modal.Model.DeletedSession) {}
+            override fun onSessionEvent(sessionEvent: Modal.Model.SessionEvent) {}
+            override fun onSessionExtend(session: Modal.Model.Session) {}
+            override fun onSessionRejected(rejectedSession: Modal.Model.RejectedSession) {}
+
+        })
+
+        AppKit.request(
+            request = request,
+            onSuccess = { result ->
+                Log.i("approveTokenTransfer", "Transaction hash: $result")
+            },
+            onError = { error ->
+                Log.e("approveTokenTransfer", "Transaction failed: ${error.message}")
+            }
+        )
+
+        val txHash = deferred.await()
+        Log.d("approveTokenTransfer", "Final transaction hash: $txHash")
+        return@withContext txHash
     }
 
     // Function to pay the ensured
 
-    suspend fun liquidateContract(contractAddress: String , callerAddress: String) : String = withContext(Dispatchers.IO) {
+    /*suspend fun liquidateContract(contractAddress: String , callerAddress: String) : String = withContext(Dispatchers.IO) {
 
         val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicurato)
 
@@ -577,11 +790,80 @@ class ContractCalls {
         val txHash = response.transactionHash
 
         return@withContext txHash
+    }*/
+
+    suspend fun liquidateContract(contractAddress: String , callerAddress: String) : String = withContext(Dispatchers.IO) {
+
+        val function = Function(
+            "liquidazione",
+            emptyList(),
+            emptyList() // output type
+        )
+
+        val encodedFunction = FunctionEncoder.encode(function)
+
+        // Crea la transazione
+        val tx = JSONObject()
+        tx.put("from", callerAddress) // da cambiare
+        tx.put("to", contractAddress)
+        tx.put("data", encodedFunction)
+        tx.put("chainId", "0xAA36A7") // Sepolia chain ID in esadecimale
+
+        // Parametri come array JSON
+        val paramsArray = JSONArray()
+        paramsArray.put(tx)
+        //paramsArray.put("latest") serve solo per eth_call?
+
+        val request = com.reown.appkit.client.models.request.Request(
+            method = "eth_sendTransaction",
+            params = paramsArray.toString()
+        )
+
+        val deferred = kotlinx.coroutines.CompletableDeferred<String>()
+
+        AppKit.setDelegate(object : AppKit.ModalDelegate {
+            override fun onSessionRequestResponse(response: Modal.Model.SessionRequestResponse) {
+                val hash = (response.result as Modal.Model.JsonRpcResponse.JsonRpcResult).result
+                Log.d("DelegateTest", "Transaction hash: $hash")
+                if (!deferred.isCompleted) deferred.complete(hash)
+            }
+
+            override fun onSessionUpdate(updatedSession: Modal.Model.UpdatedSession) {}
+
+            override fun onConnectionStateChange(state: Modal.Model.ConnectionState) {}
+
+            override fun onError(error: Modal.Model.Error) {
+                Log.e("DelegateTest", "Errore: ${error.throwable.message}", error.throwable)
+                if (!deferred.isCompleted) deferred.completeExceptionally(error.throwable)
+            }
+            override fun onProposalExpired(proposal: Modal.Model.ExpiredProposal) {}
+            override fun onRequestExpired(request: Modal.Model.ExpiredRequest) {}
+            override fun onSessionApproved(approvedSession: Modal.Model.ApprovedSession) {}
+            override fun onSessionDelete(deletedSession: Modal.Model.DeletedSession) {}
+            override fun onSessionEvent(sessionEvent: Modal.Model.SessionEvent) {}
+            override fun onSessionExtend(session: Modal.Model.Session) {}
+            override fun onSessionRejected(rejectedSession: Modal.Model.RejectedSession) {}
+
+        })
+
+        AppKit.request(
+            request = request,
+            onSuccess = { result ->
+                Log.i("approveTokenTransfer", "Transaction hash: $result")
+            },
+            onError = { error ->
+                Log.e("approveTokenTransfer", "Transaction failed: ${error.message}")
+            }
+        )
+
+        val txHash = deferred.await()
+        Log.d("approveTokenTransfer", "Final transaction hash: $txHash")
+        return@withContext txHash
     }
 
     // Function to activate the insurance contract
 
-    suspend fun activateContract(contractAddress: String, insuredAddress: String): String = withContext(Dispatchers.IO) {
+    /*suspend fun activateContract(contractAddress: String, insuredAddress: String): String = withContext(Dispatchers.IO) {
 
         val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicurato)
 
@@ -626,11 +908,80 @@ class ContractCalls {
         val txHash = response.transactionHash
 
         return@withContext txHash
+    }*/
+
+    suspend fun activateContract(contractAddress: String, insuredAddress: String): String = withContext(Dispatchers.IO) {
+
+        val function = Function(
+            "activateContract",
+            emptyList(),
+            emptyList() // output type
+        )
+
+        val encodedFunction = FunctionEncoder.encode(function)
+
+        // Crea la transazione
+        val tx = JSONObject()
+        tx.put("from", insuredAddress)
+        tx.put("to", contractAddress)
+        tx.put("data", encodedFunction)
+        tx.put("chainId", "0xAA36A7") // Sepolia chain ID in esadecimale
+
+        // Parametri come array JSON
+        val paramsArray = JSONArray()
+        paramsArray.put(tx)
+        //paramsArray.put("latest") serve solo per eth_call?
+
+        val request = com.reown.appkit.client.models.request.Request(
+            method = "eth_sendTransaction",
+            params = paramsArray.toString()
+        )
+
+        val deferred = kotlinx.coroutines.CompletableDeferred<String>()
+
+        AppKit.setDelegate(object : AppKit.ModalDelegate {
+            override fun onSessionRequestResponse(response: Modal.Model.SessionRequestResponse) {
+                val hash = (response.result as Modal.Model.JsonRpcResponse.JsonRpcResult).result
+                Log.d("DelegateTest", "Transaction hash: $hash")
+                if (!deferred.isCompleted) deferred.complete(hash)
+            }
+
+            override fun onSessionUpdate(updatedSession: Modal.Model.UpdatedSession) {}
+
+            override fun onConnectionStateChange(state: Modal.Model.ConnectionState) {}
+
+            override fun onError(error: Modal.Model.Error) {
+                Log.e("DelegateTest", "Errore: ${error.throwable.message}", error.throwable)
+                if (!deferred.isCompleted) deferred.completeExceptionally(error.throwable)
+            }
+            override fun onProposalExpired(proposal: Modal.Model.ExpiredProposal) {}
+            override fun onRequestExpired(request: Modal.Model.ExpiredRequest) {}
+            override fun onSessionApproved(approvedSession: Modal.Model.ApprovedSession) {}
+            override fun onSessionDelete(deletedSession: Modal.Model.DeletedSession) {}
+            override fun onSessionEvent(sessionEvent: Modal.Model.SessionEvent) {}
+            override fun onSessionExtend(session: Modal.Model.Session) {}
+            override fun onSessionRejected(rejectedSession: Modal.Model.RejectedSession) {}
+
+        })
+
+        AppKit.request(
+            request = request,
+            onSuccess = { result ->
+                Log.i("approveTokenTransfer", "Transaction hash: $result")
+            },
+            onError = { error ->
+                Log.e("approveTokenTransfer", "Transaction failed: ${error.message}")
+            }
+        )
+
+        val txHash = deferred.await()
+        Log.d("approveTokenTransfer", "Final transaction hash: $txHash")
+        return@withContext txHash
     }
 
     // RICHIEDE I DATI ZONIA
 
-    suspend fun requestZoniaData(contractAddress: String,insuredAddress: String) : String = withContext(Dispatchers.IO) {
+    /*suspend fun requestZoniaData(contractAddress: String,insuredAddress: String) : String = withContext(Dispatchers.IO) {
 
         val credentials = org.web3j.crypto.Credentials.create(privateKeyAssicurato)
 
@@ -674,6 +1025,75 @@ class ContractCalls {
 
         val txHash = response.transactionHash
 
+        return@withContext txHash
+    }*/
+
+    suspend fun requestZoniaData(contractAddress: String,insuredAddress: String) : String = withContext(Dispatchers.IO) {
+
+        val function = Function(
+            "requestZoniaData",
+            emptyList(),
+            emptyList() // output type
+        )
+
+        val encodedFunction = FunctionEncoder.encode(function)
+
+        // Crea la transazione
+        val tx = JSONObject()
+        tx.put("from", insuredAddress) // da cambiare
+        tx.put("to", contractAddress)
+        tx.put("data", encodedFunction)
+        tx.put("chainId", "0xAA36A7") // Sepolia chain ID in esadecimale
+
+        // Parametri come array JSON
+        val paramsArray = JSONArray()
+        paramsArray.put(tx)
+        //paramsArray.put("latest") serve solo per eth_call?
+
+        val request = com.reown.appkit.client.models.request.Request(
+            method = "eth_sendTransaction",
+            params = paramsArray.toString()
+        )
+
+        val deferred = kotlinx.coroutines.CompletableDeferred<String>()
+
+        AppKit.setDelegate(object : AppKit.ModalDelegate {
+            override fun onSessionRequestResponse(response: Modal.Model.SessionRequestResponse) {
+                val hash = (response.result as Modal.Model.JsonRpcResponse.JsonRpcResult).result
+                Log.d("DelegateTest", "Transaction hash: $hash")
+                if (!deferred.isCompleted) deferred.complete(hash)
+            }
+
+            override fun onSessionUpdate(updatedSession: Modal.Model.UpdatedSession) {}
+
+            override fun onConnectionStateChange(state: Modal.Model.ConnectionState) {}
+
+            override fun onError(error: Modal.Model.Error) {
+                Log.e("DelegateTest", "Errore: ${error.throwable.message}", error.throwable)
+                if (!deferred.isCompleted) deferred.completeExceptionally(error.throwable)
+            }
+            override fun onProposalExpired(proposal: Modal.Model.ExpiredProposal) {}
+            override fun onRequestExpired(request: Modal.Model.ExpiredRequest) {}
+            override fun onSessionApproved(approvedSession: Modal.Model.ApprovedSession) {}
+            override fun onSessionDelete(deletedSession: Modal.Model.DeletedSession) {}
+            override fun onSessionEvent(sessionEvent: Modal.Model.SessionEvent) {}
+            override fun onSessionExtend(session: Modal.Model.Session) {}
+            override fun onSessionRejected(rejectedSession: Modal.Model.RejectedSession) {}
+
+        })
+
+        AppKit.request(
+            request = request,
+            onSuccess = { result ->
+                Log.i("approveTokenTransfer", "Transaction hash: $result")
+            },
+            onError = { error ->
+                Log.e("approveTokenTransfer", "Transaction failed: ${error.message}")
+            }
+        )
+
+        val txHash = deferred.await()
+        Log.d("approveTokenTransfer", "Final transaction hash: $txHash")
         return@withContext txHash
     }
 }
