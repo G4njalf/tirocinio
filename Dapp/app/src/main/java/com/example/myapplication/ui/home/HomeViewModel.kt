@@ -19,7 +19,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
 
     private val editor = application.getSharedPreferences("UserPrefs", MODE_PRIVATE)
     private val userRole = editor.getString("user_role", null)
-    private val userAddress = editor.getString("user_address", null) ?: ""
+
+    private fun getUserAddress(): String {
+        val prefs = getApplication<Application>().getSharedPreferences("UserPrefs", MODE_PRIVATE)
+        return prefs.getString("user_address", "") ?: ""
+    }
 
     private val _totalLiquidated = MutableLiveData<Int>().apply {
         value = 0
@@ -52,10 +56,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
 
 
     fun getDataFromSepolia(){
-        Log.d("Role", "User role is: $userRole , User address is: $userAddress")
+        Log.d("Role", "User role is: $userRole , User address is: ${getUserAddress()}")
         viewModelScope.launch {
             try {
-                val balance = contractCalls.getTokenBalance(userAddress?: "")
+                val balance = contractCalls.getTokenBalance(getUserAddress()?: "")
                 _text2.value = "Token Balance: $balance MTK"
             }
             catch (e: Exception) {
@@ -67,10 +71,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
     }
 
     fun mintTokens(){
-        Log.d("HomeViewModel", "Minting tokens for user address: $userAddress")
+        Log.d("HomeViewModel", "Minting tokens for user address: ${getUserAddress()}")
         viewModelScope.launch {
             try {
-                val hashmint = blockChainCalls.mintTokens(userAddress ?: "", BigInteger.valueOf(100000)) // Minting 100000 tokens
+                val hashmint = blockChainCalls.mintTokens(getUserAddress() ?: "", BigInteger.valueOf(100000)) // Minting 100000 tokens
                 val recipt = blockChainCalls.waitForReceipt(hashmint)
                 if (recipt.status == "0x1") {
                     Log.d("HomeViewModel", "Tokens minted successfully: $hashmint")
@@ -97,16 +101,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
         viewModelScope.launch {
             try {
                 val contractAddresses: List<String> = when (userRole) {
-                    "cliente" -> contractCalls.getInsuranceContractsByInsured(userAddress,userAddress)
-                    "assicuratore" -> contractCalls.getAllInsuranceContracts(userAddress)
+                    "cliente" -> contractCalls.getInsuranceContractsByInsured(getUserAddress(),getUserAddress())
+                    "assicuratore" -> contractCalls.getAllInsuranceContracts(getUserAddress())
                     else -> emptyList()
                 }
                 val contractList = mutableListOf<Contract>()
                 for (address in contractAddresses){
-                    val data = contractCalls.getContractVariables(userAddress,address)
+                    val data = contractCalls.getContractVariables(getUserAddress(),address)
                     Log.d("data", "Contract data for $address: $data")
-                    if (data["assicurato"].toString() != userAddress.lowercase() && (userRole == "cliente")){ // normalizzo userAddress perche me li da tutto minuscolo dall bc
-                        Log.wtf("loadContracts", "Contract $address is not associated with the user address $userAddress")
+                    if (data["assicurato"].toString() != getUserAddress().lowercase() && (userRole == "cliente")){ // normalizzo userAddress perche me li da tutto minuscolo dall bc
+                        Log.wtf("loadContracts", "Contract $address is not associated with the user address ${getUserAddress()}")
                     }
                     val version = data["version"]?.toString() ?: "unknown"
                     if (version != "0.1" && false) { // bypasso il controllo della versione per ora

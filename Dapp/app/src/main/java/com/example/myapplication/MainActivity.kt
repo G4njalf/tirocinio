@@ -142,6 +142,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     else{
                         Log.i("MainActivity", "Active session found, no need to connect")
+                        Log.i("MainActivity", getSharedPreferences("UserPrefs", MODE_PRIVATE).getString("user_address", null).toString())
                         return true
                     }
                 }
@@ -219,6 +220,9 @@ class MainActivity : AppCompatActivity() {
                 putString("user_address", account.address)
             }
             Log.d("MainActivity", "Account address saved: ${account.address}")
+            val addressTextViewNav = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.addressTextViewNav)
+            addressTextViewNav.text = sharedPreferences.getString("user_address", "Indirizzo non disponibile")
+
         } else {
             Log.w("MainActivity", "No account available")
         }
@@ -226,4 +230,5 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
 }
