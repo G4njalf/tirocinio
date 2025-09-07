@@ -121,11 +121,8 @@ class HomeFragment : Fragment() {
 
             pieChart.legend.isEnabled = false
 
-
-// 🔥 Animazione
             pieChart.animateY(1400, Easing.EaseInOutQuad)
 
-// Ridisegna
             pieChart.invalidate()
         }
 

@@ -16,7 +16,7 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         val connectionType = ConnectionType.AUTOMATIC
-        val projectId = "579855a671e07abf026f809ed6bf5f3c" // Inserisci qui il Project ID
+        val projectId = "579855a671e07abf026f809ed6bf5f3c" // projectidReown
         val appMetaData = Core.Model.AppMetaData(
             name = "Kotlin.AppKit",
             description = "Kotlin AppKit Implementation",
