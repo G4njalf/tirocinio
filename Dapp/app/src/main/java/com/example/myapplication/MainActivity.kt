@@ -81,8 +81,11 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        val menu = navView.menu
+
+        menu.findItem(R.id.nav_settings).isVisible = false // nascondo le settings per ora
+
         if (userRole == "cliente"){
-            val menu = navView.menu
             menu.findItem(R.id.nav_contract_creation).isVisible = false
         }
 
