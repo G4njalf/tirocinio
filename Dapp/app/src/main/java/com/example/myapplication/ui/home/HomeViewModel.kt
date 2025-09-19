@@ -88,6 +88,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
     }
 
     fun loadContracts(){
+        Log.d("HomeViewModel","user address load contracts :"+getUserAddress())
         _totalLiquidated.value = 0
         _isLoading.value  = true
         if (contractRepository.contractData.value?.isNotEmpty() == true && false) {

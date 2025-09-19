@@ -40,4 +40,16 @@ class ContractDetailViewModel(application: Application) : AndroidViewModel(appli
         }
     }
 
+    fun activateContract(){
+
+    }
+
+    fun foundContract(){
+
+    }
+
+    fun liquidateContract(){
+
+    }
+
 }

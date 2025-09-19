@@ -27,7 +27,10 @@ contract InsuranceFactory {
 
     function createInsurance(
         address assicurato,
-        uint premioAssicurativo
+        uint premioAssicurativo,
+        string memory topic,
+        uint256 lat,
+        uint256 lng
     ) external onlyInsurer returns (address) {
         require(premioAssicurativo > 0, "Premio must be greater than 0");
         InsuranceContract newInsurance = (new InsuranceContract)(
@@ -36,7 +39,10 @@ contract InsuranceFactory {
             tokenAddress,
             premioAssicurativo,
             gateAddress,
-            zoniaTokenAddress
+            zoniaTokenAddress,
+            topic,
+            lat,
+            lng
         );
         allInsuranceContracts.push(address(newInsurance));
         insuranceContractsByInsured[assicurato].push(address(newInsurance));

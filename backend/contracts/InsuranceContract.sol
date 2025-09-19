@@ -1,11 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
+using Strings for uint256;
 
 interface IGate {
-
-    enum RequestStatus { Void, Created, Ready, Completed, Failed }
+    enum RequestStatus {
+        Void,
+        Created,
+        Ready,
+        Completed,
+        Failed
+    }
 
     struct ChainParams {
         uint256 w1;
@@ -41,18 +48,18 @@ interface IGate {
         Node[] committee;
     }
 
-    function submitRequest(InputRequest calldata inputRequest) external returns (bytes32);
-    function getRequest(bytes32 requestId) external view returns (Request memory);
-    function getResult(bytes32 requestId) external view returns (string memory);
+    function submitRequest(
+        InputRequest calldata inputRequest
+    ) external returns (bytes32);
 
+    function getRequest(
+        bytes32 requestId
+    ) external view returns (Request memory);
+
+    function getResult(bytes32 requestId) external view returns (string memory);
 }
 
-
-
-
-
 contract InsuranceContract {
-
     address public assicuratore;
     address public assicurato;
     uint public premio;
@@ -60,10 +67,20 @@ contract InsuranceContract {
     bool public attivato;
     bool public funded;
     IERC20 public token; // ERC20 token
-    string public version = "0.3";
+    string public version = "0.4";
     IGate public gate;
     bytes32 public requestId;
     IERC20 public zoniaToken;
+    string topic; // Humidity or Temperature
+    uint256 lat; // * 10000
+    uint256 lng; // * 10000
+    uint chp1;
+    uint chp2;
+    uint chp3;
+    uint chp4;
+    uint ko;
+    uint ki;
+    uint fee;
 
     event Liquidation(
         address contractAddress,
@@ -97,7 +114,10 @@ contract InsuranceContract {
         address _token,
         uint _premio,
         address _gate,
-        address _zoniaToken
+        address _zoniaToken,
+        string memory _topic,
+        uint256 _lat,
+        uint256 _lng
     ) {
         assicuratore = _assicuratore;
         assicurato = _assicurato;
@@ -108,10 +128,49 @@ contract InsuranceContract {
         funded = false;
         gate = IGate(_gate);
         zoniaToken = IERC20(_zoniaToken);
+        topic = _topic;
+        lat = _lat;
+        lng = _lng;
     }
 
-    function fundContract() public onlyInsurer {
+    function helper(uint256 value) internal pure returns (string memory) {
+        uint256 integerPart = value / 10000; // parte intera
+        uint256 decimalPart = value % 10000; // parte decimale
+
+        // padding a sinistra della parte decimale
+        string memory decStr = decimalPart.toString();
+        while (bytes(decStr).length < 4) {
+            decStr = string(abi.encodePacked("0", decStr));
+        }
+
+        return string(abi.encodePacked(integerPart.toString(), ".", decStr));
+    }
+
+    // per adesso gli passo qui chp ko ki ecc perche se li passo dal costruttore mi dice che la stack e troppo profonda
+    function fundContract(
+        uint _chp1,
+        uint _chp2,
+        uint _chp3,
+        uint _chp4,
+        uint _ko,
+        uint _ki,
+        uint _fee
+    ) public onlyInsurer {
         require(!funded, "Already funded");
+        require(
+            _chp1 + _chp2 + _chp3 + _chp4 == 100 &&
+                _ko > 0 &&
+                _ki > 0 &&
+                _fee > 0,
+            "error in parameters"
+        );
+        chp1 = _chp1;
+        chp2 = _chp2;
+        chp3 = _chp3;
+        chp4 = _chp4;
+        ko = _ko;
+        ki = _ki;
+        fee = _fee;
         token.transferFrom(
             assicuratore,
             address(this),
@@ -139,12 +198,22 @@ contract InsuranceContract {
             revert("getRequest failed");
         }
 
-        require(r.status == IGate.RequestStatus.Created, "Request not created yet"); // dovrei in realta contrrolarre se e completed (3)
-        
+        require(
+            r.status == IGate.RequestStatus.Created,
+            "Request not created yet"
+        ); // dovrei in realta contrrolarre se e completed (3)
 
         token.transfer(assicurato, premio); // trasferisce il premio all assicurato
         liquidato = true;
-        emit Liquidation(address(this), assicurato, assicuratore, premio, true, uint8(r.status), r.result);
+        emit Liquidation(
+            address(this),
+            assicurato,
+            assicuratore,
+            premio,
+            true,
+            uint8(r.status),
+            r.result
+        );
     }
 
     function activateContract() external onlyInsured {
@@ -162,44 +231,50 @@ contract InsuranceContract {
         emit Activated(address(this), assicurato, assicuratore, premio, true);
     }
 
-    function requestZoniaData() external onlyInsured { 
-
+    function requestZoniaData() external onlyInsured {
         require(!liquidato, "Already liquidated");
         require(attivato, "Contract not activated yet");
         require(funded, "Contract has to be funded");
 
         require(
-        zoniaToken.allowance(assicurato, address(this)) >= 1,
-        "Insufficient ZoniaToken allowance"
+            zoniaToken.allowance(assicurato, address(this)) >= 1,
+            "Insufficient ZoniaToken allowance"
         );
 
         require(
-        zoniaToken.balanceOf(assicurato) >= 1,
-        "Insufficient ZoniaToken balance"
+            zoniaToken.balanceOf(assicurato) >= 1,
+            "Insufficient ZoniaToken balance"
         );
 
         IGate.InputRequest memory req = IGate.InputRequest({
-            query: "{\"topic\":\"saref:Temperature\",\"geo\":{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[11.5820,48.1351]},\"properties\":{\"radius\":1000}}}",
-            chainParams: IGate.ChainParams(25, 25, 25, 25),
-            ko: 0,
-            ki: 0,
-            fee: 1
+            query: string(
+                abi.encodePacked(
+                    '{"topic":"saref:',
+                    topic,
+                    '","geo":{"type":"Feature","geometry":{"type":"Point","coordinates":[',
+                    helper(lat),
+                    ",",
+                    helper(lng),
+                    ']},"properties":{"radius":1000}}}'
+                )
+            ),
+            chainParams: IGate.ChainParams(chp1, chp2, chp3, chp4),
+            ko: ko,
+            ki: ki,
+            fee: fee
         });
 
-
         require(
-        zoniaToken.transferFrom(assicurato, address(this), 1),
-        "TransferFrom failed"
+            zoniaToken.transferFrom(assicurato, address(this), fee),
+            "TransferFrom failed"
         );
 
-
         require(
-        zoniaToken.approve(address(gate), 1),
-        "Approve to Gate failed"
+            zoniaToken.approve(address(gate), fee),
+            "Approve to Gate failed"
         );
 
         requestId = gate.submitRequest(req);
-
     }
 
     modifier onlyInsurer() {

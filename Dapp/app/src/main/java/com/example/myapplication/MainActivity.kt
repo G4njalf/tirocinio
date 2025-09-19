@@ -17,6 +17,7 @@ import android.view.MenuItem
 import android.content.Intent
 import android.net.Uri
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.net.toUri
 import com.reown.android.Core
 import com.reown.android.CoreClient
@@ -43,6 +44,11 @@ class MainActivity : AppCompatActivity() {
         // Recupera il ruolo dell'utente
         val sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
         val userRole = sharedPreferences.getString("user_role", "cliente")
+        val userAddress = sharedPreferences.getString("user_address", "Indirizzo non disponibile")
+
+        if (userAddress == "Indirizzo non disponibile"){
+            Toast.makeText(this,"user address not found, connect metamask!",Toast.LENGTH_LONG).show()
+        }
 
         // Controlla il ruolo e carica il layout principale
         if (userRole == "cliente") {
@@ -52,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             val roleTextView = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.roleTextView)
             roleTextView.text = "Hello, Client"
             val addressTextViewNav = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.addressTextViewNav)
-            addressTextViewNav.text = sharedPreferences.getString("user_address", "Indirizzo non disponibile")
+            addressTextViewNav.text = userAddress
             setSupportActionBar(binding.appBarMain.toolbar)
 
         } else if (userRole == "assicuratore") {
@@ -62,7 +68,7 @@ class MainActivity : AppCompatActivity() {
             val roleTextView = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.roleTextView)
             roleTextView.text = "Hello, Ensurer"
             val addressTextViewNav = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.addressTextViewNav)
-            addressTextViewNav.text = sharedPreferences.getString("user_address", "Indirizzo non disponibile")
+            addressTextViewNav.text = userAddress
 
             setSupportActionBar(binding.appBarMain.toolbar)
 
@@ -112,6 +118,7 @@ class MainActivity : AppCompatActivity() {
                 val editor = sharedPreferences.edit()
                 editor.clear() // Rimuove tutti i dati salvati
                 editor.apply()
+                Log.d("MainActivity",getSharedPreferences("UserPrefs", MODE_PRIVATE).getString("user_address",null) ?: "null" )
 
                 // Torna alla LoginActivity
                 val intent = Intent(this, LoginActivity::class.java)
@@ -229,8 +236,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             Log.w("MainActivity", "No account available")
         }
-
-
 
     }
 

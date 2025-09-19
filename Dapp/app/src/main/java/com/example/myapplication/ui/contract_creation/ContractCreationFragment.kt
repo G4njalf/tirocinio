@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.databinding.FragmentContractCreationBinding
@@ -32,6 +33,10 @@ class ContractCreationFragment : Fragment() {
 
         contractCreationViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.progressBarCreateContract.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        contractCreationViewModel.contractCreated.observe(viewLifecycleOwner) {
+            contractCreated -> if (contractCreated) Toast.makeText(context,"Contract created successfully!",Toast.LENGTH_LONG).show()
         }
 
         binding.buttonCreateContract.setOnClickListener {

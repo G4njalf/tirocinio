@@ -28,6 +28,9 @@ class ContractCreationViewModel(application: Application) : AndroidViewModel(app
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    private val _contractCreated = MutableLiveData<Boolean>(false)
+    val contractCreated: LiveData<Boolean> get() = _contractCreated
+
     // Function to create a contract [poi chiamo getallContracts per prendere tutti i contratti e ritorno l ultimo]
     // funziona se sono l unico alla volta che crea un contratto
     fun createContract(address: String, premio: UInt) {
@@ -96,6 +99,7 @@ class ContractCreationViewModel(application: Application) : AndroidViewModel(app
                 Log.e("ContractCreationViewModel", "Invalid address: $address")
             }
             _isLoading.value = false
+            _contractCreated.value = true
 
         }
     }
