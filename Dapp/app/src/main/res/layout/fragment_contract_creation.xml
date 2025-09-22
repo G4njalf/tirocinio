@@ -23,30 +23,63 @@
         android:layout_height="wrap_content"
         android:hint="Insert Insurance Premium"
         android:inputType="number"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextEnsurer"
+        app:layout_constraintBottom_toTopOf="@+id/radioGroup" />
 
     <Button
         android:id="@+id/buttonCreateContract"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create Contract"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarCreateContract"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPremio" />
+        app:layout_constraintTop_toBottomOf="@+id/mapView" />
 
     <ProgressBar
         android:id="@+id/progressBarCreateContract"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="36dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/mapView"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonCreateContract"
-        app:layout_constraintVertical_bias="0.505" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextPremio">
+
+        <RadioButton
+            android:id="@+id/radio_tmp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Temperature" />
+
+        <RadioButton
+            android:id="@+id/radio_hum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Humidity" />
+    </RadioGroup>
+
+    <org.osmdroid.views.MapView
+        android:id="@+id/mapView"
+        android:layout_width="353dp"
+        android:layout_height="178dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup"
+        app:layout_constraintBottom_toTopOf="@+id/buttonCreateContract" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

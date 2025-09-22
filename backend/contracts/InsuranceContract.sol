@@ -71,16 +71,16 @@ contract InsuranceContract {
     IGate public gate;
     bytes32 public requestId;
     IERC20 public zoniaToken;
-    string topic; // Humidity or Temperature
-    uint256 lat; // * 10000
-    uint256 lng; // * 10000
-    uint chp1;
-    uint chp2;
-    uint chp3;
-    uint chp4;
-    uint ko;
-    uint ki;
-    uint fee;
+    string public topic; // Humidity or Temperature
+    uint256 public lat; // * 10000
+    uint256 public lng; // * 10000
+    uint public chp1;
+    uint public chp2;
+    uint public chp3;
+    uint public chp4;
+    uint public ko;
+    uint public ki;
+    uint public fee;
 
     event Liquidation(
         address contractAddress,

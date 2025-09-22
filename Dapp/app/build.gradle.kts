@@ -88,7 +88,6 @@ dependencies {
     implementation("com.reown:android-core")
     implementation("com.reown:appkit")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    //implementation("com.walletconnect:android-core:1.17.0")
-    //implementation("com.walletconnect:sign:1.17.0")
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
 
 }

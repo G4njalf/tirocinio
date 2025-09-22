@@ -33,7 +33,7 @@ class ContractCreationViewModel(application: Application) : AndroidViewModel(app
 
     // Function to create a contract [poi chiamo getallContracts per prendere tutti i contratti e ritorno l ultimo]
     // funziona se sono l unico alla volta che crea un contratto
-    fun createContract(address: String, premio: UInt) {
+    fun createContract(address: String, premio: UInt, topic: String , lat: UInt, lng: UInt) {
         _isLoading.value = true
         Log.d("ContractCreationViewModel", "Creating contract for: ${address}, Premio: $premio")
         if (premio <= 0u) {
@@ -56,7 +56,7 @@ class ContractCreationViewModel(application: Application) : AndroidViewModel(app
             }
             if (isValid) {
                 try {
-                    txHash = contractCalls.createNewContract(usraddress,address,Uint256(premio.toLong()))
+                    txHash = contractCalls.createNewContract(usraddress,address,Uint256(premio.toLong()),topic,Uint256(lat.toLong()),Uint256(lng.toLong()))
                     Log.d("ContractCreationViewModel", "Contract created transaction Hash: $txHash")
 
                 } catch (e: Exception) {
