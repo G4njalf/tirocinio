@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
 
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_contract_creation, R.id.nav_settings
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_contract_creation, R.id.nav_settings, R.id.nav_chain_params
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -93,6 +93,7 @@ class MainActivity : AppCompatActivity() {
 
         if (userRole == "cliente"){
             menu.findItem(R.id.nav_contract_creation).isVisible = false
+            menu.findItem(R.id.nav_chain_params).isVisible = false
         }
 
 

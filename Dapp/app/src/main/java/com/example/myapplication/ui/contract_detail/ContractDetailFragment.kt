@@ -14,6 +14,7 @@ import com.example.myapplication.data.BlockChainCalls
 import com.example.myapplication.data.ContractCalls
 import com.example.myapplication.databinding.FragmentContractDetailsBinding
 import com.example.myapplication.databinding.FragmentHomeBinding
+import com.example.myapplication.ui.chain_params.ChainParamsViewModel
 import com.example.myapplication.ui.contract_detail.ContractDetailViewModel
 import kotlinx.coroutines.launch
 import java.math.BigInteger
@@ -235,6 +236,15 @@ class ContractDetailFragment : Fragment() {
 
 
         binding.fundContractbtn.setOnClickListener {
+
+            val prefs = requireContext().getSharedPreferences("chain_params_prefs", MODE_PRIVATE)
+            val chp1 = prefs.getInt("chp1", 0)
+            val chp2 = prefs.getInt("chp2", 0)
+            val chp3 = prefs.getInt("chp3", 0)
+            val chp4 = prefs.getInt("chp4", 0)
+
+            Log.i("foundContractbtn", "chp1: $chp1, chp2: $chp2, chp3: $chp3, chp4: $chp4")
+
             Log.i("ContractDetailActivity", "Found button clicked")
             val addressAssicuratoresafe = addressAssicuratore ?: ""
             val premiotoBigInteger = premio?.toBigIntegerOrNull() ?: BigInteger.ZERO
@@ -270,7 +280,7 @@ class ContractDetailFragment : Fragment() {
                     Log.e("ContractDetailActivity", "Error during funding process", e)
                 }
                 try {
-                    val fundhash = contractCalls.fundContract(usrAddress,addressContractSafe)
+                    val fundhash = contractCalls.fundContract(usrAddress,addressContractSafe,chp1,chp2,chp3,chp4)
                     val recipt = blockChainCalls.waitForReceipt(fundhash)
                     Log.d("ContractDetailActivity", "Recipt: $recipt")
                     if (recipt.status == "0x1") {

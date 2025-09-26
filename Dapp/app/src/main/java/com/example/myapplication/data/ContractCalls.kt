@@ -517,16 +517,22 @@ class ContractCalls {
 
     // Function to fund the insurance contract ( l assicuratore deve inviare i fondi al contratto)
 
-    suspend fun fundContract(addrAssicuratore: String,contractAddress: String): String = withContext(Dispatchers.IO){
+    suspend fun fundContract(
+        addrAssicuratore: String,
+        contractAddress: String,
+        chp1: Int,
+        chp2: Int,
+        chp3: Int,
+        chp4: Int): String = withContext(Dispatchers.IO){
 
         // parametri di found
-        val chp1 = Uint256(25)
-        val chp2 = Uint256(25)
-        val chp3 = Uint256(25)
-        val chp4 = Uint256(25)
+        val chp1 = Uint256(chp1.toLong())
+        val chp2 = Uint256(chp2.toLong())
+        val chp3 = Uint256(chp3.toLong())
+        val chp4 = Uint256(chp4.toLong())
         val ko = Uint256(1)
         val ki = Uint256(1)
-        val fee = Uint256(10)
+        val fee = Uint256(20)
 
         val function = Function(
             "fundContract",

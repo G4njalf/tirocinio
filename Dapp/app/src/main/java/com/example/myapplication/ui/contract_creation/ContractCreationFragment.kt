@@ -162,6 +162,7 @@ class ContractCreationFragment : Fragment() {
             }
             val latInt = (lat * 10000).toUInt()
             val lngInt = (lng * 10000).toUInt()
+            
             contractCreationViewModel.createContract(insuredAddress,premio,topic,latInt,lngInt)
         }
 

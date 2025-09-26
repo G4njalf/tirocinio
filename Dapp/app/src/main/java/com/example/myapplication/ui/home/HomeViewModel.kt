@@ -155,8 +155,4 @@ class HomeViewModel(application: Application) : AndroidViewModel(application){
             _isLoading.value = false
         }
     }
-
-
-
-
 }

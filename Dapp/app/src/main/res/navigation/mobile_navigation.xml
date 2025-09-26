@@ -33,6 +33,12 @@
         android:label="@string/menu_settings"
         tools:layout="@layout/fragment_settings" />
 
+    <fragment
+        android:id="@+id/nav_chain_params"
+        android:name="com.example.myapplication.ui.chain_params.ChainParamsFragment"
+        android:label="@string/menu_chain_params"
+        tools:layout="@layout/fragment_chain_params" />
+
 
     <fragment
         android:id="@+id/nav_contract_detail"

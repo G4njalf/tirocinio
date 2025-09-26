@@ -12,7 +12,28 @@
     <string name="menu_contracts">Contracts</string>
     <string name="menu_contract_creation">Contract Creation</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_chain_params">Chain Params</string>
     <string name="menu_logout">Logout</string>
     <string name="graph_title">Contract Details Graph</string>
     <string name="menu_contract_detail">Contract Detail</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    
+    <string name="chp1_label">Chain Param 1 - Value: 25</string>
+    <string name="chp2_label">Chain Param 2 - Value: 25</string>
+    <string name="chp3_label">Chain Param 3 - Value: 25</string>
+    <string name="chp4_label">Chain Param 4 - Value: 25</string>
+    
 </resources>

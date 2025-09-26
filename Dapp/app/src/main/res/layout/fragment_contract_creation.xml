@@ -23,10 +23,10 @@
         android:layout_height="wrap_content"
         android:hint="Insert Insurance Premium"
         android:inputType="number"
+        app:layout_constraintBottom_toTopOf="@+id/radioGroup"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextEnsurer"
-        app:layout_constraintBottom_toTopOf="@+id/radioGroup" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextEnsurer" />
 
     <Button
         android:id="@+id/buttonCreateContract"
@@ -49,6 +49,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
 
+
     <RadioGroup
         android:id="@+id/radioGroup"
         android:layout_width="wrap_content"
@@ -56,6 +57,7 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/mapView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextPremio">
 
@@ -77,9 +79,9 @@
         android:id="@+id/mapView"
         android:layout_width="353dp"
         android:layout_height="178dp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonCreateContract"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup"
-        app:layout_constraintBottom_toTopOf="@+id/buttonCreateContract" />
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
